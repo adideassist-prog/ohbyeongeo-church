@@ -5,7 +5,7 @@
   const opening = document.querySelector(".opening-screen");
   if (!opening) return;
 
-  const sessionKey = "ohbyeongeo-opening-seen";
+  const sessionKey = "ohbyeongeo-opening-seen-v2";
 
   try {
     if (window.sessionStorage.getItem(sessionKey) === "1") {
@@ -161,13 +161,11 @@
 
       if (route === "/") {
         const opening = nextMain.querySelector(".opening-screen");
+        opening?.remove();
+
         try {
-          if (window.sessionStorage.getItem("ohbyeongeo-opening-seen") === "1") {
-            opening?.remove();
-          }
-        } catch {
-          opening?.remove();
-        }
+          window.sessionStorage.setItem("ohbyeongeo-opening-seen-v2", "1");
+        } catch {}
       }
 
       currentMain.replaceWith(nextMain);
