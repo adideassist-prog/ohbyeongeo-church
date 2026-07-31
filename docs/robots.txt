@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://adideassist-prog.github.io/ohbyeongeo-church/sitemap.xml
