@@ -216,16 +216,25 @@
 
   const day = getKoreaDay();
   const storageKey = "ohbyeongeo-visitor-counted-" + day;
+  const cookieName = "ohbyeongeo_visitor_day";
   let alreadyCounted = false;
 
   try {
     alreadyCounted = localStorage.getItem(storageKey) === "1";
   } catch {}
 
+  if (!alreadyCounted) {
+    alreadyCounted = document.cookie
+      .split(";")
+      .some((item) => item.trim() === cookieName + "=" + day);
+  }
+
   const rememberToday = () => {
     try {
       localStorage.setItem(storageKey, "1");
     } catch {}
+    document.cookie =
+      cookieName + "=" + day + "; Max-Age=172800; Path=/; SameSite=Lax; Secure";
   };
 
   const render = () => {
