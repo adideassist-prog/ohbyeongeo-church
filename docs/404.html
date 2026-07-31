@@ -15,6 +15,11 @@
     window.sessionStorage.setItem(sessionKey, "1");
   } catch {}
 
+  // Server rendering leaves the opening screen in its hidden "checking"
+  // state. GitHub Pages does not hydrate this client component, so reveal it
+  // explicitly after the first-visit check succeeds.
+  opening.classList.remove("opening-screen--checking");
+
   const closeOpening = () => {
     opening.classList.add("is-leaving");
     opening.style.pointerEvents = "none";
