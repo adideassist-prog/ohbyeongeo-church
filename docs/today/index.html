@@ -200,29 +200,32 @@
   if (window.__OHBYEONGEO_VISITOR_STARTED__) return;
   window.__OHBYEONGEO_VISITOR_STARTED__ = true;
 
-  const storageKey = "ohbyeongeo-anonymous-visitor-v1";
-  const endpoint =
-    "https://ohbyeongeo-church.modoomoa365.chatgpt.site/api/visitors";
+  const namespace = "adideassist-prog-ohbyeongeo-church-365";
   let visitorCount = null;
 
-  const createVisitorId = () => {
-    if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
-    const bytes = crypto.getRandomValues(new Uint8Array(24));
-    return "visitor-" + Array.from(bytes, (byte) =>
-      byte.toString(16).padStart(2, "0"),
-    ).join("");
+  const getKoreaDay = () => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const part = (type) => parts.find((item) => item.type === type)?.value || "";
+    return part("year") + "-" + part("month") + "-" + part("day");
   };
 
-  const getVisitorId = () => {
+  const day = getKoreaDay();
+  const storageKey = "ohbyeongeo-visitor-counted-" + day;
+  let alreadyCounted = false;
+
+  try {
+    alreadyCounted = localStorage.getItem(storageKey) === "1";
+  } catch {}
+
+  const rememberToday = () => {
     try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) return saved;
-      const created = createVisitorId();
-      localStorage.setItem(storageKey, created);
-      return created;
-    } catch {
-      return createVisitorId();
-    }
+      localStorage.setItem(storageKey, "1");
+    } catch {}
   };
 
   const render = () => {
@@ -237,18 +240,23 @@
     subtree: true,
   });
 
-  fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ visitorId: getVisitorId() }),
-    cache: "no-store",
-  })
+  const action = alreadyCounted ? "/" : "/up";
+  const endpoint =
+    "https://api.counterapi.dev/v1/" + namespace + "/visitors-" + day + action;
+
+  fetch(endpoint, { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error("Unable to load visitor count");
       return response.json();
     })
     .then((data) => {
-      if (typeof data.count === "number") visitorCount = data.count;
+      if (typeof data.count === "number") {
+        visitorCount = data.count;
+        if (!alreadyCounted) {
+          alreadyCounted = true;
+          rememberToday();
+        }
+      }
       render();
     })
     .catch(() => undefined);
