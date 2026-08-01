@@ -55,7 +55,9 @@ const openingFallback = `
   // Match the live Site exactly: keep the intro visible for 1.8 seconds,
   // then let the same 1.15-second upward motion reveal the homepage.
   window.setTimeout(() => {
-    opening.remove();
+    // React owns the opening node after hydration. Removing it here races with
+    // GitHubApp's state update and can make React unmount the whole document.
+    // The CSS animation already hides the intro, so only release page scrolling.
     releasePage();
   }, 3000);
 })();

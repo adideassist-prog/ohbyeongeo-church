@@ -42,10 +42,11 @@ test("renders development preview metadata", async () => {
 });
 
 test("GitHub export keeps the live intro appearance and first-load order", async () => {
-  const exportScript = await readFile(
-    new URL("../scripts/export-github-pages.mjs", import.meta.url),
-    "utf8",
-  );
+  const [exportScript, homeExport, notFoundExport] = await Promise.all([
+    readFile(new URL("../scripts/export-github-pages.mjs", import.meta.url), "utf8"),
+    readFile(new URL("../docs/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../docs/404.html", import.meta.url), "utf8"),
+  ]);
 
   assert.match(exportScript, /background:#f8f3eb/);
   assert.match(exportScript, /width:min\(330px,82vw\)/);
@@ -57,6 +58,9 @@ test("GitHub export keeps the live intro appearance and first-load order", async
     /body>main>\*:not\(\.opening-screen\)\{visibility:hidden/,
   );
   assert.doesNotMatch(exportScript, /ohbyeongeo-opening-seen-v2/);
+  assert.doesNotMatch(exportScript, /opening\.remove\(\)/);
+  assert.doesNotMatch(homeExport, /opening\.remove\(\)/);
+  assert.doesNotMatch(notFoundExport, /opening\.remove\(\)/);
   assert.doesNotMatch(exportScript, /nextMain\.querySelector\(\"\.opening-screen\"\)/);
   assert.match(exportScript, /const routes = \[\.\.\.publicRoutes, "\/admin"\]/);
   assert.match(exportScript, /\/github\?route=/);

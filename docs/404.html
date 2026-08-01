@@ -25,7 +25,6 @@ html.intro-pending .opening-screen__english{color:rgba(68,55,43,.5);font-family:
   // Match the live Site exactly: keep the intro visible for 1.8 seconds,
   // then let the same 1.15-second upward motion reveal the homepage.
   window.setTimeout(() => {
-    opening.remove();
     releasePage();
   }, 3000);
 })();
