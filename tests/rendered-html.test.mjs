@@ -53,6 +53,7 @@ test("GitHub export keeps the live intro appearance and first-load order", async
   assert.match(exportScript, /font-size:9px/);
   assert.match(exportScript, /opening-screen-critical-leave 1\.15s 1\.8s/);
   assert.match(exportScript, /class="intro-pending"/);
+  assert.match(exportScript, /opening-screen--settled/);
   assert.doesNotMatch(
     exportScript,
     /body>main>\*:not\(\.opening-screen\)\{visibility:hidden/,
