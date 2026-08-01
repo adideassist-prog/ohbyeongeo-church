@@ -55,6 +55,9 @@ test("GitHub export keeps the live intro appearance and first-load order", async
   assert.doesNotMatch(exportScript, /ohbyeongeo-opening-seen-v2/);
   assert.doesNotMatch(exportScript, /nextMain\.querySelector\(\"\.opening-screen\"\)/);
   assert.match(exportScript, /const routes = \[\.\.\.publicRoutes, "\/admin"\]/);
+  assert.match(exportScript, /\/github\?route=/);
+  assert.doesNotMatch(exportScript, /createHardNavigationScript/);
+  assert.doesNotMatch(exportScript, /window\.location\.assign/);
   assert.doesNotMatch(exportScript, /removeVinextRuntime/);
 });
 

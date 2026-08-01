@@ -1,4 +1,4 @@
-import{r as e,t}from"./rolldown-runtime-S-ySWqyJ.js";import{t as n}from"./index-Ck6qGrDK.js";var r={date:`2026년 8월 2일 · 주일`,volume:`Vol. 001`,passage:`요한복음 6장 1–13절`,title:`작은 나눔, 큰 은혜`,preacher:`서광봉 담임목사`,schedule:`8.05 수요 말씀예배
+import{r as e,t}from"./rolldown-runtime-S-ySWqyJ.js";import{t as n}from"./index-HH7hn2kT.js";var r={date:`2026년 8월 2일 · 주일`,volume:`Vol. 001`,passage:`요한복음 6장 1–13절`,title:`작은 나눔, 큰 은혜`,preacher:`서광봉 담임목사`,schedule:`8.05 수요 말씀예배
 8.07 금요 기도모임
 매일 새벽기도회`,service:`대표기도 · 담당자 안내 예정
 예배안내 · 안내위원
