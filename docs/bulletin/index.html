@@ -51,12 +51,19 @@
       return minutes + ":" + seconds;
     };
 
+    const renderIcon = (playing) => {
+      button.innerHTML = playing
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="6.5" width="3.5" height="11" rx="1" fill="currentColor" stroke="none"></rect><rect x="13" y="6.5" width="3.5" height="11" rx="1" fill="currentColor" stroke="none"></rect></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7 8 5-8 5V7Z" fill="currentColor" stroke="none"></path></svg>';
+    };
+
     const update = () => {
       const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
       const current = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
       const progress = duration > 0 ? (current / duration) * 100 : 0;
 
       player.classList.toggle("is-playing", !audio.paused);
+      renderIcon(!audio.paused);
       button.setAttribute("aria-pressed", String(!audio.paused));
       button.setAttribute(
         "aria-label",
