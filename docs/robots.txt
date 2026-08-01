@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://adideassist-prog.github.io/ohbyeongeo-church/sitemap.xml
+Sitemap: https://ohbyeongeo-church.modoomoa365.chatgpt.site/sitemap.xml
