@@ -64,7 +64,6 @@ const openingFallback = `
 const openingCriticalStyle = `<style id="opening-critical">
 html.intro-pending,
 html.intro-pending body{margin:0;overflow:hidden}
-html.intro-pending body>main>*:not(.opening-screen){visibility:hidden!important}
 html.intro-pending .opening-screen{position:fixed;z-index:2147483647;inset:0;display:grid;width:100%;height:100%;overflow:hidden;place-items:center;padding:0;background:#f8f3eb;box-shadow:0 24px 70px rgba(55,42,30,.16);color:inherit;text-align:center;transform:translateY(0);will-change:transform;animation:opening-screen-critical-leave 1.15s 1.8s forwards cubic-bezier(.76,0,.24,1)}
 html.intro-pending .opening-screen__brand{display:flex;align-items:center;flex-direction:column;gap:13px;animation:opening-brand-critical-in .8s .12s both cubic-bezier(.2,.75,.25,1)}
 html.intro-pending .opening-screen__brand img{display:block;width:min(330px,82vw);height:auto;object-fit:contain}
@@ -72,7 +71,7 @@ html.intro-pending .opening-screen__english{color:rgba(68,55,43,.5);font-family:
 @keyframes opening-brand-critical-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes opening-screen-critical-leave{0%{visibility:visible;transform:translateY(0)}99%{visibility:visible;transform:translateY(-105%)}100%{visibility:hidden;pointer-events:none;transform:translateY(-105%)}}
 @media (max-width:700px){html.intro-pending .opening-screen__brand{gap:9px}html.intro-pending .opening-screen__brand img{width:min(292px,84vw)}html.intro-pending .opening-screen__english{font-size:7px;letter-spacing:.19em}}
-</style><noscript><style>html.intro-pending,html.intro-pending body{overflow:auto}html.intro-pending body>main>*{visibility:visible!important}html.intro-pending .opening-screen{display:none!important}</style></noscript>`;
+</style><noscript><style>html.intro-pending,html.intro-pending body{overflow:auto}html.intro-pending .opening-screen{display:none!important}</style></noscript>`;
 
 function prepareOpeningPage(html) {
   return html

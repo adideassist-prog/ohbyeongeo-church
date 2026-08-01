@@ -2,7 +2,6 @@
 <style id="opening-critical">
 html.intro-pending,
 html.intro-pending body{margin:0;overflow:hidden}
-html.intro-pending body>main>*:not(.opening-screen){visibility:hidden!important}
 html.intro-pending .opening-screen{position:fixed;z-index:2147483647;inset:0;display:grid;width:100%;height:100%;overflow:hidden;place-items:center;padding:0;background:#f8f3eb;box-shadow:0 24px 70px rgba(55,42,30,.16);color:inherit;text-align:center;transform:translateY(0);will-change:transform;animation:opening-screen-critical-leave 1.15s 1.8s forwards cubic-bezier(.76,0,.24,1)}
 html.intro-pending .opening-screen__brand{display:flex;align-items:center;flex-direction:column;gap:13px;animation:opening-brand-critical-in .8s .12s both cubic-bezier(.2,.75,.25,1)}
 html.intro-pending .opening-screen__brand img{display:block;width:min(330px,82vw);height:auto;object-fit:contain}
