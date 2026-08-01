@@ -80,41 +80,6 @@ function prepareOpeningPage(html) {
     .replace("</head>", `${openingCriticalStyle}</head>`);
 }
 
-function createHardNavigationScript() {
-  return `
-<script>
-(() => {
-  const basePath = "/ohbyeongeo-church";
-  document.addEventListener(
-    "click",
-    (event) => {
-      const anchor = event.target.closest?.("a[href]");
-      if (!anchor || event.defaultPrevented || event.button !== 0) return;
-      if (anchor.target && anchor.target !== "_self") return;
-
-      const url = new URL(anchor.href, window.location.href);
-      if (url.origin !== window.location.origin) return;
-
-      const isChurchRoute =
-        url.pathname === basePath || url.pathname.startsWith(basePath + "/");
-      if (!isChurchRoute) return;
-
-      const sameDocument =
-        url.pathname === window.location.pathname &&
-        url.search === window.location.search;
-      if (sameDocument && url.hash) return;
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      window.churchMusicPersistNow?.();
-      window.location.assign(url.href);
-    },
-    true,
-  );
-})();
-</script>`;
-}
-
 const musicPlayerFallback = `
 <script>
 (() => {
@@ -454,7 +419,9 @@ const context = {
 const renderedPages = new Map();
 for (const route of routes) {
   const response = await worker.default.fetch(
-    new Request(`https://ohbyeongeo-church.modoomoa365.chatgpt.site${route}`),
+    new Request(
+      `https://ohbyeongeo-church.modoomoa365.chatgpt.site/github?route=${encodeURIComponent(route)}`,
+    ),
     {},
     context,
   );
@@ -470,7 +437,7 @@ for (const route of routes) {
 function createStaticPage(route) {
   const renderedPage = renderedPages.get(route);
   const page = route === "/" ? prepareOpeningPage(renderedPage) : renderedPage;
-  const beforeRuntime = `${route === "/" ? openingFallback : ""}${createHardNavigationScript()}${musicPlayerFallback}`;
+  const beforeRuntime = `${route === "/" ? openingFallback : ""}${musicPlayerFallback}`;
 
   return page.replace(
     '<script id="_R_">',

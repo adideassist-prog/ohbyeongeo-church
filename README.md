@@ -1,12 +1,11 @@
 # 오병이어교회 홈페이지
 
-오병이어교회의 실제 운영 소스입니다. 홈·이번 주 주보·오늘의 말씀·교회소식·관리자 화면을 하나의 서버형 앱으로 운영합니다.
+오병이어교회의 실제 운영 소스입니다. GitHub Pages에서도 홈·이번 주 주보·오늘의 말씀·교회소식·관리자 화면을 하나의 앱으로 운영합니다.
 
 ## 운영 주소
 
-- 홈페이지: https://ohbyeongeo-church.modoomoa365.chatgpt.site/
-- 관리자: https://ohbyeongeo-church.modoomoa365.chatgpt.site/admin
-- 기존 GitHub Pages 주소는 위 운영 주소로 자동 연결됩니다.
+- 홈페이지: https://adideassist-prog.github.io/ohbyeongeo-church/
+- 관리자: https://adideassist-prog.github.io/ohbyeongeo-church/admin/
 
 ## 주요 기능
 
@@ -19,11 +18,11 @@
 
 ## 구조
 
-- GitHub: 원본 소스와 변경 이력 보관
-- 서버형 운영 배포: 실제 홈페이지와 API 실행
+- GitHub: 원본 소스, 변경 이력, GitHub Pages 운영
+- GitHub Pages: 한 페이지 앱으로 화면을 전환해 음악 플레이어 유지
 - Supabase: 관리자 로그인과 게시물·댓글 데이터 저장
 
-`app/layout.tsx`의 음악 플레이어는 전체 앱에서 한 번만 생성됩니다. 내부 메뉴는 Next.js의 `Link`로 이동하므로 새 HTML 문서를 열지 않고 음악을 계속 재생합니다.
+GitHub Pages에서는 `app/GitHubApp.tsx`가 주소와 화면만 바꾸고, `app/layout.tsx`의 음악 플레이어는 전체 앱에서 한 번만 생성됩니다. 따라서 내부 메뉴를 이동해도 음악이 끊기지 않습니다.
 
 ## 개발
 
