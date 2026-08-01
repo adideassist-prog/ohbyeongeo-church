@@ -201,20 +201,30 @@
   window.updateChurchVisitorCounter = () => {
     render();
     if (request) return request;
-    request = Promise.all([
-      loadCounter("visitors-" + day, !dailyAlreadyCounted),
-      loadCounter("visitors-total-from-2026-08-01", !totalAlreadyCounted),
-    ])
+    const dailyRequest = loadCounter(
+      "visitors-" + day,
+      !dailyAlreadyCounted,
+    ).then((count) => {
+      if (!dailyAlreadyCounted) {
+        dailyAlreadyCounted = true;
+        remember(dailyStorageKey, dailyCookieName);
+      }
+      return count;
+    });
+    const totalRequest = loadCounter(
+      "visitors-total-from-2026-08-01",
+      !totalAlreadyCounted,
+    ).then((count) => {
+      if (!totalAlreadyCounted) {
+        totalAlreadyCounted = true;
+        remember(totalStorageKey, totalCookieName);
+      }
+      return count;
+    });
+
+    request = Promise.all([dailyRequest, totalRequest])
       .then(([today, total]) => {
-        visitorCounts = { today, total };
-        if (!dailyAlreadyCounted) {
-          dailyAlreadyCounted = true;
-          remember(dailyStorageKey, dailyCookieName);
-        }
-        if (!totalAlreadyCounted) {
-          totalAlreadyCounted = true;
-          remember(totalStorageKey, totalCookieName);
-        }
+        visitorCounts = { today, total: Math.max(total, today) };
         render();
       })
       .catch(() => undefined);
