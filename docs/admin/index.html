@@ -3,6 +3,7 @@
 <script>
 (() => {
   const basePath = "/ohbyeongeo-church";
+  const rootChurchRoutes = new Set(["/", "/bulletin", "/today", "/news", "/admin"]);
   document.addEventListener(
     "click",
     (event) => {
@@ -12,6 +13,13 @@
 
       const url = new URL(anchor.href, window.location.href);
       if (url.origin !== window.location.origin) return;
+
+      // Keep navigation safe even if a cached client bundle briefly restores
+      // the app's root-relative routes after hydration.
+      const rootPath = url.pathname.replace(/\/+$/, "") || "/";
+      if (rootChurchRoutes.has(rootPath)) {
+        url.pathname = rootPath === "/" ? basePath + "/" : basePath + rootPath;
+      }
 
       const isChurchRoute =
         url.pathname === basePath || url.pathname.startsWith(basePath + "/");
