@@ -7,6 +7,7 @@ import {
   defaultBulletin,
   defaultNews,
   defaultWord,
+  mergePublishedWords,
   newsFromItem,
   type BulletinDraft,
   type ContentItem,
@@ -172,6 +173,7 @@ function toDisplayDate(value: string) {
     month: "2-digit",
     day: "2-digit",
     weekday: "long",
+    timeZone: "Asia/Seoul",
   })
     .format(date)
     .replace(/\. /g, ". ");
@@ -179,7 +181,7 @@ function toDisplayDate(value: string) {
 
 function uniqueDailyWords(items: ContentItem[]) {
   const seenDates = new Set<string>();
-  return items
+  const uniqueItems = items
     .filter((item) => item.content_type === "daily_word")
     .sort((a, b) => b.content_date.localeCompare(a.content_date))
     .filter((item) => {
@@ -187,6 +189,8 @@ function uniqueDailyWords(items: ContentItem[]) {
       seenDates.add(item.content_date);
       return true;
     });
+
+  return mergePublishedWords(uniqueItems);
 }
 
 function safeFilename(filename: string) {
@@ -202,8 +206,42 @@ function sectionToContentType(section: AdminSection): ContentType | null {
   return null;
 }
 
-export default function AdminWorkspace() {
-  const supabase = useMemo(() => createClient(), []);
+export function AdminConnectionUnavailable() {
+  return (
+    <main className="admin-page admin-login-page">
+      <section className="admin-login-card" aria-labelledby="admin-connection-title">
+        <div className="admin-login-brand">
+          <LogoMark />
+          <div>
+            <strong>오병이어교회</strong>
+            <span>홈페이지 관리</span>
+          </div>
+        </div>
+        <div className="admin-login-copy">
+          <p>ADMIN</p>
+          <h1 id="admin-connection-title">관리 화면 연결을<br />확인하고 있어요.</h1>
+          <span>잠시 후 새로고침해 주세요. 문제가 계속되면 홈페이지 관리자에게 알려주세요.</span>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export default function AdminWorkspace({
+  supabaseUrl,
+  supabasePublishableKey,
+}: {
+  supabaseUrl: string;
+  supabasePublishableKey: string;
+}) {
+  const supabase = useMemo(
+    () =>
+      createClient({
+        url: supabaseUrl,
+        publishableKey: supabasePublishableKey,
+      }),
+    [supabasePublishableKey, supabaseUrl],
+  );
   const [authReady, setAuthReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [email, setEmail] = useState("");
@@ -219,9 +257,7 @@ export default function AdminWorkspace() {
   const [word, setWord] = useState<WordDraft>({ ...defaultWord });
   const [dailyWords, setDailyWords] = useState<ContentItem[]>([]);
   const [news, setNews] = useState<NewsDraft>({ ...defaultNews });
-  const [bulletinFile, setBulletinFile] = useState<File | null>(null);
   const [newsFile, setNewsFile] = useState<File | null>(null);
-  const [bulletinMedia, setBulletinMedia] = useState<{ url: string; type: "image" | "pdf" } | null>(null);
   const [newsMedia, setNewsMedia] = useState<{ url: string; type: "image" | "pdf" } | null>(null);
 
   useEffect(() => {
@@ -245,9 +281,6 @@ export default function AdminWorkspace() {
       setDailyWords(uniqueDailyWords(items));
       setNews(newsFromItem(latestNews));
 
-      if (latestBulletin?.media_url && latestBulletin.media_type) {
-        setBulletinMedia({ url: latestBulletin.media_url, type: latestBulletin.media_type });
-      }
       if (latestNews?.media_url && latestNews.media_type) {
         setNewsMedia({ url: latestNews.media_url, type: latestNews.media_type });
       }
@@ -293,7 +326,15 @@ export default function AdminWorkspace() {
       await loadContent();
     };
 
-    supabase.auth.getSession().then(({ data }) => acceptSession(data.session));
+    supabase.auth
+      .getSession()
+      .then(({ data }) => acceptSession(data.session))
+      .catch(() => {
+        if (!active) return;
+        setSignedIn(false);
+        setLoginError("관리자 연결을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        setAuthReady(true);
+      });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       window.setTimeout(() => void acceptSession(session), 0);
     });
@@ -379,11 +420,12 @@ export default function AdminWorkspace() {
     setNotice("게시 내용을 안전하게 저장하고 있어요…");
 
     try {
-      let media = section === "bulletin" ? bulletinMedia : section === "news" ? newsMedia : null;
-      const selectedFile = section === "bulletin" ? bulletinFile : section === "news" ? newsFile : null;
+      let media = section === "news" ? newsMedia : null;
+      const bulletinDraft = bulletin;
+      const selectedFile = section === "news" ? newsFile : null;
       if (selectedFile) media = await uploadFile(contentType, selectedFile);
 
-      const draft = contentType === "bulletin" ? bulletin : contentType === "daily_word" ? word : news;
+      const draft = contentType === "bulletin" ? bulletinDraft : contentType === "daily_word" ? word : news;
       const contentDate = toDatabaseDate(draft.date);
       const now = new Date().toISOString();
 
@@ -410,7 +452,8 @@ export default function AdminWorkspace() {
         if (revealError) throw revealError;
 
         const existing = dailyWords.find((item) => item.content_date === contentDate);
-        const result = existing
+        const persistedExisting = existing && !existing.id.startsWith("default-daily-word-");
+        const result = persistedExisting
           ? await supabase
               .from("content_items")
               .update({ ...record, is_featured: true })
@@ -461,8 +504,7 @@ export default function AdminWorkspace() {
       }
 
       if (section === "bulletin") {
-        setBulletinFile(null);
-        setBulletinMedia(media);
+        setBulletin(bulletinDraft);
       }
       if (section === "news") {
         setNewsFile(null);
@@ -526,7 +568,8 @@ export default function AdminWorkspace() {
     );
   }
 
-  const selectedMedia = section === "bulletin" ? bulletinMedia : section === "news" ? newsMedia : null;
+  const selectedMedia = section === "news" ? newsMedia : null;
+  const selectedMediaUrl = selectedMedia?.url;
 
   return (
     <main className="admin-page">
@@ -582,7 +625,7 @@ export default function AdminWorkspace() {
                   <span className="admin-content-card__number">0{index + 1}</span>
                   <DashboardIcon name={item} />
                   <strong>{sectionLabels[item]}</strong>
-                  <small>{item === "bulletin" ? "예배 순서·섬김·주보 파일" : item === "today" ? "성경 구절·묵상·기도" : item === "news" ? "공지·행사·사진" : "댓글 공개·숨김·삭제"}</small>
+                  <small>{item === "bulletin" ? "예배 순서·선교편지·섬김" : item === "today" ? "성경 구절·묵상·기도" : item === "news" ? "공지·행사·사진" : "댓글 공개·숨김·삭제"}</small>
                   <i>{item === "comments" ? "확인하기 →" : "수정하기 →"}</i>
                 </button>
               ))}
@@ -598,7 +641,10 @@ export default function AdminWorkspace() {
             </div>
           </section>
         ) : section === "comments" ? (
-          <AdminCommentsPanel />
+          <AdminCommentsPanel
+            supabaseUrl={supabaseUrl}
+            supabasePublishableKey={supabasePublishableKey}
+          />
         ) : (
           <section className="admin-editor" aria-label={`${sectionLabels[section]} 편집`}>
             <div className="admin-editor__heading">
@@ -625,13 +671,33 @@ export default function AdminWorkspace() {
                         <Field label="말씀 제목"><input value={bulletin.title} onChange={(event) => setBulletin({ ...bulletin, title: event.target.value })} /></Field>
                         <Field label="설교자"><input value={bulletin.preacher} onChange={(event) => setBulletin({ ...bulletin, preacher: event.target.value })} /></Field>
                       </div>
+                      <Field label="말씀 본문 요약" hint="말씀 카드에 인용문으로 표시됩니다."><textarea rows={4} value={bulletin.verse} onChange={(event) => setBulletin({ ...bulletin, verse: event.target.value })} /></Field>
                     </div>
                     <div className="admin-form__group">
                       <div className="admin-form__group-title"><b>02</b><span><strong>이번 주 안내</strong><small>한 줄에 한 항목씩 입력하세요.</small></span></div>
-                      <Field label="이번 주 일정"><textarea rows={5} value={bulletin.schedule} onChange={(event) => setBulletin({ ...bulletin, schedule: event.target.value })} /></Field>
-                      <Field label="이번 주 섬김"><textarea rows={5} value={bulletin.service} onChange={(event) => setBulletin({ ...bulletin, service: event.target.value })} /></Field>
+                      <Field label="예배 순서" hint="항목 | 담당자 형식으로 한 줄씩 입력"><textarea rows={9} value={bulletin.worshipOrder} onChange={(event) => setBulletin({ ...bulletin, worshipOrder: event.target.value })} /></Field>
+                      <Field label="기도 제목"><textarea rows={7} value={bulletin.prayerPoints} onChange={(event) => setBulletin({ ...bulletin, prayerPoints: event.target.value })} /></Field>
+                      <Field label="교회소식"><textarea rows={7} value={bulletin.announcements} onChange={(event) => setBulletin({ ...bulletin, announcements: event.target.value })} /></Field>
                     </div>
-                    <UploadField label="주보 이미지 또는 PDF" accept="image/*,.pdf" file={bulletinFile} currentUrl={bulletinMedia?.url} onFileChange={(file) => { setBulletinFile(file); if (file?.type.startsWith("image/")) setBulletinMedia({ url: URL.createObjectURL(file), type: "image" }); if (file?.type === "application/pdf") setBulletinMedia({ url: "", type: "pdf" }); }} />
+                    <div className="admin-form__group">
+                      <div className="admin-form__group-title"><b>03</b><span><strong>선교편지</strong><small>제목 | 본문 형식으로 한 줄씩 입력하세요.</small></span></div>
+                      <Field label="선교편지 네 가지 소식" hint="한 줄마다 제목 | 본문"><textarea rows={18} value={bulletin.missionLetter} onChange={(event) => setBulletin({ ...bulletin, missionLetter: event.target.value })} /></Field>
+                      <Field label="선교편지 맺음말" hint="문단 사이는 한 줄을 비워 주세요."><textarea rows={10} value={bulletin.missionClosing} onChange={(event) => setBulletin({ ...bulletin, missionClosing: event.target.value })} /></Field>
+                      <Field label="선교편지 서명"><input value={bulletin.missionSignature} onChange={(event) => setBulletin({ ...bulletin, missionSignature: event.target.value })} /></Field>
+                    </div>
+                    <div className="admin-form__group">
+                      <div className="admin-form__group-title"><b>04</b><span><strong>협력 사역</strong><small>한 줄에 한 곳씩 입력하세요.</small></span></div>
+                      <Field label="국내 협력"><textarea rows={10} value={bulletin.partnersDomestic} onChange={(event) => setBulletin({ ...bulletin, partnersDomestic: event.target.value })} /></Field>
+                      <Field label="해외 협력"><textarea rows={18} value={bulletin.partnersOverseas} onChange={(event) => setBulletin({ ...bulletin, partnersOverseas: event.target.value })} /></Field>
+                      <Field label="군선교"><textarea rows={3} value={bulletin.partnerMilitary} onChange={(event) => setBulletin({ ...bulletin, partnerMilitary: event.target.value })} /></Field>
+                      <Field label="협력 기관"><textarea rows={4} value={bulletin.partnerInstitutions} onChange={(event) => setBulletin({ ...bulletin, partnerInstitutions: event.target.value })} /></Field>
+                    </div>
+                    <div className="admin-form__group">
+                      <div className="admin-form__group-title"><b>05</b><span><strong>예배위원과 교회 섬김이</strong><small>원본 주보의 이름과 순서를 그대로 관리합니다.</small></span></div>
+                      <Field label="월간 대표기도" hint="날짜 | 담당자 형식으로 한 줄씩 입력"><textarea rows={6} value={bulletin.monthlyPrayer} onChange={(event) => setBulletin({ ...bulletin, monthlyPrayer: event.target.value })} /></Field>
+                      <Field label="헌금위원"><textarea rows={3} value={bulletin.offeringCommittee} onChange={(event) => setBulletin({ ...bulletin, offeringCommittee: event.target.value })} /></Field>
+                      <Field label="교회와 섬김이" hint="직분 | 이름 형식으로 한 줄씩 입력"><textarea rows={8} value={bulletin.churchTeam} onChange={(event) => setBulletin({ ...bulletin, churchTeam: event.target.value })} /></Field>
+                    </div>
                   </>
                 ) : null}
 
@@ -696,7 +762,7 @@ export default function AdminWorkspace() {
                   <div className="admin-preview__top"><span>홈페이지 미리보기</span><small>입력 즉시 반영</small></div>
                   <div className="admin-preview__browser">
                     <div className="admin-preview__browser-bar"><i /><i /><i /><span>오병이어교회</span></div>
-                    <PreviewCard section={section} bulletin={bulletin} word={word} news={news} mediaUrl={selectedMedia?.url || undefined} mediaType={selectedMedia?.type} />
+                    <PreviewCard section={section} bulletin={bulletin} word={word} news={news} mediaUrl={selectedMediaUrl || undefined} mediaType={selectedMedia?.type ?? null} />
                   </div>
                 </aside>
               ) : null}
