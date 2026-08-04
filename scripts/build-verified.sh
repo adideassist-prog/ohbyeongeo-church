@@ -19,6 +19,10 @@ if [[ ! -x "${vinext}" ]]; then
 fi
 
 echo "Running bounded vinext build..."
+# Vinext/Vite may leave hashed chunks from an earlier build in dist/client.
+# A clean output directory keeps GitHub Pages HTML and assets from mixing
+# generations, which previously left routes such as /today and /admin blank.
+rm -rf -- "${SITES_PROJECT_ROOT}/dist"
 timeout \
   --signal=TERM \
   --kill-after="${SITES_BUILD_KILL_AFTER:-10s}" \

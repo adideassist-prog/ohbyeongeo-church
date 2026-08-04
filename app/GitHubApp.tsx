@@ -2,9 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  bulletinFromItem,
   defaultBulletin,
   defaultNews,
   defaultWord,
+  newsFromItem,
+  type ContentItem,
+  wordFromItem,
 } from "../lib/church-content";
 import AdminWorkspace from "./admin/AdminWorkspace";
 import BulletinExperience from "./bulletin/BulletinExperience";
@@ -51,15 +55,31 @@ const routeTitles: Record<GitHubRoute, string> = {
   "/admin": "교회 홈페이지 관리 | 오병이어교회",
 };
 
-export default function GitHubApp({ initialPath = "/" }: { initialPath?: string }) {
+export default function GitHubApp({
+  initialPath = "/",
+  initialBulletinItem = null,
+  initialWordItems = [],
+  initialNewsItems = [],
+  supabaseUrl,
+  supabasePublishableKey,
+}: {
+  initialPath?: string;
+  initialBulletinItem?: ContentItem | null;
+  initialWordItems?: ContentItem[];
+  initialNewsItems?: ContentItem[];
+  supabaseUrl?: string;
+  supabasePublishableKey?: string;
+}) {
   const initialRoute = useMemo(() => normalizePath(initialPath), [initialPath]);
   const [route, setRoute] = useState<GitHubRoute>(initialRoute);
+  const [routeVersion, setRouteVersion] = useState(0);
   const [showOpening, setShowOpening] = useState(initialRoute === "/");
 
   const applyRoute = useCallback((next: URL, historyMode: "push" | "replace" | "none") => {
     const nextRoute = normalizePath(next.pathname);
     setShowOpening(false);
     setRoute(nextRoute);
+    setRouteVersion((value) => value + 1);
 
     if (historyMode !== "none") {
       const nextUrl = publicPath(nextRoute, next.search, next.hash);
@@ -78,7 +98,6 @@ export default function GitHubApp({ initialPath = "/" }: { initialPath?: string 
 
   useEffect(() => {
     const current = browserRoute();
-    setRoute(current);
     document.title = routeTitles[current];
 
     const hideOpening = window.setTimeout(() => setShowOpening(false), 3100);
@@ -140,26 +159,56 @@ export default function GitHubApp({ initialPath = "/" }: { initialPath?: string 
   }, [applyRoute, route]);
 
   if (route === "/admin") {
-    return <AdminWorkspace />;
+    return (
+      <AdminWorkspace
+        supabaseUrl={supabaseUrl}
+        supabasePublishableKey={supabasePublishableKey}
+      />
+    );
   }
 
   if (route === "/bulletin") {
-    return <BulletinExperience initialItem={null} />;
+    return (
+      <BulletinExperience
+        key={routeVersion}
+        initialItem={initialBulletinItem}
+      />
+    );
   }
 
   if (route === "/today") {
-    return <TodayExperience initialItems={[]} initialSelectedDate={null} />;
+    return (
+      <TodayExperience
+        key={routeVersion}
+        initialItems={initialWordItems}
+        initialSelectedDate={null}
+      />
+    );
   }
 
   if (route === "/news") {
-    return <NewsExperience initialItems={[]} />;
+    return (
+      <NewsExperience key={routeVersion} initialItems={initialNewsItems} />
+    );
   }
 
   return (
     <HomePageView
-      bulletin={{ ...defaultBulletin }}
-      word={{ ...defaultWord }}
-      news={{ ...defaultNews }}
+      bulletin={
+        initialBulletinItem
+          ? bulletinFromItem(initialBulletinItem)
+          : { ...defaultBulletin }
+      }
+      word={
+        initialWordItems[0]
+          ? wordFromItem(initialWordItems[0])
+          : { ...defaultWord }
+      }
+      news={
+        initialNewsItems[0]
+          ? newsFromItem(initialNewsItems[0])
+          : { ...defaultNews }
+      }
       showOpening={showOpening}
     />
   );

@@ -49,9 +49,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  other: {
-    "codex-preview": "development",
-  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -64,7 +61,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html:
+              "html.intro-seen .opening-screen{display:none!important;visibility:hidden!important;animation:none!important;pointer-events:none!important}",
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (() => {
+                try {
+                  const key = "ohbyeongeo-church-intro-seen-v1";
+                  const path = location.pathname.replace(/\\/+$/, "") || "/";
+                  const isHome = path === "/" || path.endsWith("/ohbyeongeo-church");
+                  const seen = sessionStorage.getItem(key) === "1";
+                  if (!isHome && !seen) sessionStorage.setItem(key, "1");
+                  if (seen || !isHome) document.documentElement.classList.add("intro-seen");
+                } catch {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         {children}
         <MusicPlayer />

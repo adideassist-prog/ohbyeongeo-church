@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { loadPublishedContent, loadPublishedWords } from "../../lib/load-content";
 import GitHubApp from "../GitHubApp";
 
 export const dynamic = "force-dynamic";
@@ -38,12 +40,39 @@ export async function generateMetadata({
   const params = await searchParams;
   const route = requestedRoute(params.route);
   const meta = routeMetadata[route];
+  const isAdmin = route === "/admin";
 
   return {
     title: { absolute: meta.title },
     description: meta.description,
     alternates: { canonical: route },
-    robots: route === "/admin" ? { index: false, follow: false } : undefined,
+    robots: isAdmin ? { index: false, follow: false } : undefined,
+    openGraph: isAdmin
+      ? undefined
+      : {
+          title: meta.title,
+          description: meta.description,
+          url: route,
+          siteName: "오병이어교회",
+          locale: "ko_KR",
+          type: "website",
+          images: [
+            {
+              url: "/images/church-social-preview.png",
+              width: 1200,
+              height: 630,
+              alt: "따뜻한 햇살 아래 놓인 다섯 개의 떡과 두 마리 생선",
+            },
+          ],
+        },
+    twitter: isAdmin
+      ? undefined
+      : {
+          card: "summary_large_image",
+          title: meta.title,
+          description: meta.description,
+          images: ["/images/church-social-preview.png"],
+        },
   };
 }
 
@@ -54,5 +83,27 @@ export default async function GitHubPage({
 }) {
   const params = await searchParams;
   const initialPath = requestedRoute(params.route);
-  return <GitHubApp initialPath={initialPath} />;
+  const [[bulletinItem], wordItems, newsItems] = await Promise.all([
+    loadPublishedContent("bulletin"),
+    loadPublishedWords(),
+    loadPublishedContent("news", 12),
+  ]);
+  const requestHeaders = await headers();
+  const supabaseUrl =
+    requestHeaders.get("x-church-supabase-url") ??
+    process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublishableKey =
+    requestHeaders.get("x-church-supabase-key") ??
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  return (
+    <GitHubApp
+      initialPath={initialPath}
+      initialBulletinItem={bulletinItem ?? null}
+      initialWordItems={wordItems}
+      initialNewsItems={newsItems}
+      supabaseUrl={supabaseUrl}
+      supabasePublishableKey={supabasePublishableKey}
+    />
+  );
 }

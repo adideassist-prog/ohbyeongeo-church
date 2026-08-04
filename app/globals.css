@@ -993,6 +993,13 @@ svg {
     transform 1.15s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
+html.intro-seen .opening-screen {
+  display: none !important;
+  visibility: hidden;
+  animation: none;
+  pointer-events: none;
+}
+
 .opening-screen__brand {
   display: flex;
   align-items: center;
@@ -5351,4 +5358,624 @@ svg {
   .published-media__pdf { align-items: flex-start; flex-direction: column; }
   .published-media__pdf a { width: 100%; }
   .admin-preview-card__media { max-height: 150px; }
+}
+
+/* Detailed weekly bulletin */
+.bulletin-editorial {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(370px, 0.92fr);
+  min-height: 650px;
+  margin: -35px 0 70px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #f4ebdd;
+  box-shadow: 0 30px 80px rgb(64 48 35 / 12%);
+}
+
+.bulletin-editorial__art {
+  position: relative;
+  min-height: 650px;
+  overflow: hidden;
+  background: #efe5d4;
+}
+
+.bulletin-editorial__art::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 72%, rgb(244 235 221 / 98%));
+  content: "";
+  pointer-events: none;
+}
+
+.bulletin-editorial__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 51% center;
+}
+
+.bulletin-editorial__copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(45px, 5.5vw, 82px) clamp(34px, 5vw, 76px);
+}
+
+.bulletin-editorial__copy::before {
+  position: absolute;
+  top: 42px;
+  right: 42px;
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgb(201 95 61 / 35%);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 8px #f4ebdd, inset 0 0 0 9px rgb(201 95 61 / 16%);
+  color: var(--terracotta);
+  content: "5·2";
+  font-family: "Iowan Old Style", serif;
+  font-size: 11px;
+  line-height: 58px;
+  text-align: center;
+}
+
+.bulletin-editorial__copy > span {
+  color: var(--terracotta);
+  font-family: "Iowan Old Style", serif;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.bulletin-editorial__copy > p:not(.bulletin-editorial__church) {
+  margin: 35px 0 8px;
+  color: #656158;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.bulletin-editorial__copy h2 {
+  margin: 0;
+  color: var(--navy);
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: clamp(50px, 5.4vw, 82px);
+  font-weight: 500;
+  letter-spacing: -0.08em;
+  line-height: 1.02;
+}
+
+.bulletin-editorial__copy > div {
+  display: grid;
+  gap: 7px;
+  margin-top: 38px;
+  padding-top: 24px;
+  border-top: 1px solid rgb(41 51 50 / 16%);
+}
+
+.bulletin-editorial__copy > div strong {
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.bulletin-editorial__copy > div small {
+  color: var(--terracotta-deep);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bulletin-editorial__copy blockquote {
+  margin: 26px 0 0;
+  color: #676158;
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 14px;
+  line-height: 1.95;
+}
+
+.bulletin-editorial__church {
+  margin: 34px 0 0;
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.bulletin-community {
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.bulletin-prayer,
+.bulletin-announcements {
+  min-height: 620px;
+  padding: clamp(38px, 4.5vw, 68px);
+}
+
+.bulletin-prayer {
+  background: radial-gradient(circle at 90% 86%, rgb(148 191 208 / 13%), transparent 26%), var(--navy);
+  color: #fff9f0;
+}
+
+.bulletin-prayer .content-section-title h2 { color: #fff9f0; }
+.bulletin-prayer .content-section-title > small { color: rgb(255 249 240 / 55%); }
+
+.bulletin-prayer ol,
+.bulletin-announcements ol {
+  margin: 42px 0 0;
+  padding: 0;
+  border-top: 1px solid rgb(255 255 255 / 15%);
+  list-style: none;
+}
+
+.bulletin-prayer li {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: start;
+  gap: 18px;
+  padding: 19px 0;
+  border-bottom: 1px solid rgb(255 255 255 / 13%);
+}
+
+.bulletin-prayer li span {
+  color: #e8a17c;
+  font-family: "Iowan Old Style", serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.bulletin-prayer li p {
+  margin: 0;
+  color: rgb(255 249 240 / 77%);
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.bulletin-announcements {
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.bulletin-announcements ol { border-color: var(--line); }
+
+.bulletin-announcements li {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 16px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.bulletin-announcements li b {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ead8c5;
+  color: var(--terracotta-deep);
+  font-family: "Iowan Old Style", serif;
+  font-size: 10px;
+}
+
+.bulletin-announcements li p {
+  margin: 1px 0 0;
+  color: #615d56;
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+.bulletin-mission-note {
+  margin-top: 30px;
+  padding: 27px 28px;
+  border-left: 3px solid var(--blue);
+  background: #edf1ef;
+}
+
+.bulletin-mission-note > span,
+.partner-section__header > span,
+.partner-card > span {
+  color: var(--terracotta);
+  font-family: "Iowan Old Style", serif;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.bulletin-mission-note strong {
+  display: block;
+  margin-top: 10px;
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 21px;
+}
+
+.bulletin-mission-note p {
+  margin: 12px 0 0;
+  color: #68645d;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.mission-letter {
+  position: relative;
+  margin-top: 70px;
+  overflow: hidden;
+  border: 1px solid rgb(24 59 80 / 14%);
+  background: #fffdfa;
+  box-shadow: 0 28px 70px rgb(55 43 34 / 9%);
+}
+
+.mission-letter::after {
+  position: absolute;
+  right: -170px;
+  bottom: -210px;
+  width: 500px;
+  height: 500px;
+  border: 1px solid rgb(109 151 174 / 12%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 70px rgb(109 151 174 / 4%);
+  content: "";
+  pointer-events: none;
+}
+
+.mission-letter__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 250px;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(42px, 6vw, 78px);
+  background: radial-gradient(circle at 80% 30%, rgb(109 151 174 / 21%), transparent 25%), var(--navy);
+  color: #fffaf1;
+}
+
+.mission-letter__header span {
+  color: #e9a481;
+  font-family: "Iowan Old Style", serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.mission-letter__header h2 {
+  margin: 17px 0 8px;
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: clamp(48px, 5.4vw, 78px);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+}
+
+.mission-letter__header p {
+  margin: 0;
+  color: rgb(255 250 241 / 65%);
+  font-size: 14px;
+}
+
+.mission-flame {
+  width: clamp(64px, 8vw, 98px);
+  height: auto;
+  fill: none;
+  stroke: #d99370;
+  stroke-width: 1.4px;
+}
+
+.mission-letter__items {
+  position: relative;
+  z-index: 1;
+  padding: clamp(10px, 2vw, 24px) clamp(30px, 7vw, 100px) 0;
+}
+
+.mission-letter__items article {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: clamp(17px, 3vw, 36px);
+  padding: clamp(38px, 5vw, 64px) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.mission-letter__items article > span {
+  padding-top: 6px;
+  color: var(--terracotta);
+  font-family: "Iowan Old Style", serif;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+
+.mission-letter__items h3 {
+  margin: 0;
+  color: var(--navy);
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: clamp(23px, 2.3vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+
+.mission-letter__items p,
+.mission-letter__closing p {
+  margin: 18px 0 0;
+  color: #5f5b53;
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 15px;
+  line-height: 2;
+  word-break: keep-all;
+}
+
+.mission-letter__closing {
+  position: relative;
+  z-index: 1;
+  margin: clamp(42px, 6vw, 80px) clamp(30px, 7vw, 100px) clamp(50px, 7vw, 92px);
+  padding: clamp(30px, 4vw, 52px);
+  border-left: 3px solid var(--blue);
+  background: #eef2f0;
+}
+
+.mission-letter__closing p:first-child { margin-top: 0; }
+
+.mission-letter__closing strong {
+  display: block;
+  margin-top: 30px;
+  color: var(--navy);
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 15px;
+  text-align: right;
+}
+
+.partner-section {
+  margin-top: 70px;
+  padding: clamp(48px, 7vw, 98px);
+  background: #eee4d5;
+}
+
+.partner-section__header {
+  display: grid;
+  max-width: 720px;
+  margin-bottom: clamp(42px, 6vw, 74px);
+}
+
+.partner-section__header h2 {
+  margin: 16px 0 0;
+  color: var(--navy);
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: clamp(41px, 5vw, 70px);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 1.12;
+}
+
+.partner-section__header p {
+  margin: 20px 0 0;
+  color: #746d63;
+  font-size: 13px;
+}
+
+.partner-section__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.partner-card {
+  padding: clamp(32px, 4vw, 54px);
+  border: 1px solid rgb(44 49 44 / 12%);
+  background: #fffdf9;
+}
+
+.partner-card--overseas { background: var(--navy); }
+.partner-card--overseas > span { color: #e8a17c; }
+
+.partner-card ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 22px;
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.partner-card li {
+  position: relative;
+  padding-left: 13px;
+  color: #625e56;
+  font-size: 12px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.partner-card li::before {
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  content: "";
+}
+
+.partner-card--overseas li { color: rgb(255 250 241 / 72%); }
+.partner-card--overseas li::before { background: #d99370; }
+.partner-card--compact ul { grid-template-columns: 1fr; }
+
+.bulletin-people {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.monthly-committee,
+.church-team {
+  padding: clamp(38px, 4.8vw, 68px);
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.monthly-committee { background: #f5eee2; }
+
+.monthly-committee__table {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.monthly-committee__table > div {
+  display: grid;
+  min-height: 145px;
+  align-content: center;
+  gap: 8px;
+  padding: 18px 12px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.monthly-committee__table time {
+  color: var(--terracotta);
+  font-family: "Iowan Old Style", serif;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.monthly-committee__table span { color: #858078; font-size: 10px; }
+
+.monthly-committee__table strong {
+  color: var(--navy);
+  font-family: AppleMyungjo, "Noto Serif KR", serif;
+  font-size: 14px;
+}
+
+.monthly-committee__offering {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 18px 22px;
+  background: var(--navy);
+  color: #fffaf2;
+}
+
+.monthly-committee__offering span {
+  margin-right: auto;
+  color: #e7a17c;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.monthly-committee__offering strong { font-size: 12px; }
+
+.church-team dl {
+  margin: 40px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.church-team dl > div {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.church-team dt {
+  color: var(--terracotta);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.church-team dd {
+  margin: 0;
+  color: #615d56;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@media (max-width: 1050px) {
+  .bulletin-editorial { grid-template-columns: 1fr; }
+  .bulletin-editorial__art { min-height: 500px; }
+  .bulletin-editorial__art::after { background: linear-gradient(transparent 78%, #f4ebdd); }
+  .bulletin-editorial__copy { min-height: 520px; }
+  .partner-section__grid,
+  .bulletin-people { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 980px) {
+  .bulletin-community { grid-template-columns: 1fr; }
+  .bulletin-prayer,
+  .bulletin-announcements { min-height: 0; }
+}
+
+@media (max-width: 700px) {
+  .bulletin-editorial {
+    min-height: 0;
+    margin: -28px 0 55px;
+  }
+  .bulletin-editorial__art { min-height: 340px; }
+  .bulletin-editorial__art img { object-position: 57% center; }
+  .bulletin-editorial__copy { min-height: 0; padding: 45px 25px 49px; }
+  .bulletin-editorial__copy::before {
+    top: 30px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+  }
+  .bulletin-editorial__copy > p:not(.bulletin-editorial__church) { margin-top: 34px; }
+  .bulletin-editorial__copy h2 { font-size: 51px; }
+  .bulletin-editorial__copy blockquote { font-size: 13px; line-height: 1.85; }
+  .bulletin-community { margin-top: 14px; }
+  .bulletin-prayer,
+  .bulletin-announcements { padding: 39px 23px; }
+  .bulletin-prayer li { grid-template-columns: 29px 1fr; gap: 10px; }
+  .bulletin-prayer li p { font-size: 14px; }
+  .bulletin-announcements li { grid-template-columns: 30px 1fr; gap: 10px; }
+  .bulletin-mission-note { padding: 23px 20px; }
+  .mission-letter { margin-top: 55px; }
+  .mission-letter__header { min-height: 220px; padding: 38px 25px; }
+  .mission-letter__header h2 { font-size: 48px; }
+  .mission-flame { width: 56px; }
+  .mission-letter__items { padding: 0 23px; }
+  .mission-letter__items article {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 10px;
+    padding: 37px 0;
+  }
+  .mission-letter__items h3 { font-size: 23px; line-height: 1.42; }
+  .mission-letter__items p,
+  .mission-letter__closing p { font-size: 14px; line-height: 1.9; word-break: normal; }
+  .mission-letter__closing { margin: 40px 22px 48px; padding: 27px 22px; }
+  .mission-letter__closing strong { text-align: left; line-height: 1.7; }
+  .partner-section { margin-top: 55px; padding: 44px 18px; }
+  .partner-section__header { padding: 0 5px; }
+  .partner-section__header h2 { font-size: 42px; }
+  .partner-section__grid { grid-template-columns: 1fr; }
+  .partner-card { padding: 32px 24px; }
+  .partner-card ul { grid-template-columns: 1fr; gap: 10px; }
+  .bulletin-people { grid-template-columns: 1fr; margin-top: 14px; }
+  .monthly-committee,
+  .church-team { padding: 39px 23px; }
+  .monthly-committee__table { grid-template-columns: 1fr; }
+  .monthly-committee__table > div {
+    grid-template-columns: 54px 70px 1fr;
+    min-height: 78px;
+    align-items: center;
+    text-align: left;
+  }
+  .monthly-committee__offering {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .monthly-committee__offering span { margin-right: 0; }
+  .church-team dl > div { grid-template-columns: 70px minmax(0, 1fr); gap: 12px; }
 }

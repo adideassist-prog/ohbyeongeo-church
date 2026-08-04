@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   description:
     "오병이어교회와 함께 오늘의 성경 말씀을 읽고 묵상하며 기도하세요.",
   alternates: { canonical: "/today" },
+  openGraph: {
+    title: "오늘의 말씀 | 오병이어교회",
+    description:
+      "오병이어교회와 함께 오늘의 성경 말씀을 읽고 묵상하며 기도하세요.",
+    url: "/today",
+  },
 };
 
 export const dynamic = "force-dynamic";

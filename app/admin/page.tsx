@@ -8,8 +8,18 @@ export const metadata: Metadata = {
     index: false,
     follow: false,
   },
+  alternates: { canonical: "/admin" },
 };
 
 export default function AdminPage() {
-  return <AdminWorkspace />;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  return (
+    <AdminWorkspace
+      supabaseUrl={supabaseUrl}
+      supabasePublishableKey={supabasePublishableKey}
+    />
+  );
 }

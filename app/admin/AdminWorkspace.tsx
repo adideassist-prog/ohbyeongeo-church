@@ -231,18 +231,26 @@ export default function AdminWorkspace({
   supabaseUrl,
   supabasePublishableKey,
 }: {
-  supabaseUrl: string;
-  supabasePublishableKey: string;
+  supabaseUrl?: string;
+  supabasePublishableKey?: string;
 }) {
   const supabase = useMemo(
-    () =>
-      createClient({
-        url: supabaseUrl,
-        publishableKey: supabasePublishableKey,
-      }),
+    () => {
+      try {
+        return createClient({
+          url: supabaseUrl,
+          publishableKey: supabasePublishableKey,
+        });
+      } catch {
+        // The render below checks this sentinel before any editor action can
+        // run. Keeping the client type stable avoids nullable checks in every
+        // authenticated operation.
+        return null as never;
+      }
+    },
     [supabasePublishableKey, supabaseUrl],
   );
-  const [authReady, setAuthReady] = useState(false);
+  const [authReady, setAuthReady] = useState(() => !supabase);
   const [signedIn, setSignedIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -261,6 +269,8 @@ export default function AdminWorkspace({
   const [newsMedia, setNewsMedia] = useState<{ url: string; type: "image" | "pdf" } | null>(null);
 
   useEffect(() => {
+    if (!supabase) return;
+
     let active = true;
 
     const loadContent = async () => {
@@ -350,6 +360,7 @@ export default function AdminWorkspace({
     setBusy(true);
     setLoginError("");
 
+    if (!supabase) return;
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setLoginError("이메일 또는 비밀번호를 다시 확인해 주세요.");
@@ -363,6 +374,7 @@ export default function AdminWorkspace({
 
   const signOut = async () => {
     setBusy(true);
+    if (!supabase) return;
     await supabase.auth.signOut();
     setSection("home");
     setBusy(false);
@@ -527,6 +539,10 @@ export default function AdminWorkspace({
       setBusy(false);
     }
   };
+
+  if (!supabase) {
+    return <AdminConnectionUnavailable />;
+  }
 
   if (!authReady) {
     return (

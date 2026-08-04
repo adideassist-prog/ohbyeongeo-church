@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   description:
     "오병이어교회의 이번 주 예배 순서와 말씀, 일정, 봉사 안내를 확인하세요.",
   alternates: { canonical: "/bulletin" },
+  openGraph: {
+    title: "이번 주 주보 | 오병이어교회",
+    description:
+      "오병이어교회의 이번 주 예배 순서와 말씀, 일정, 봉사 안내를 확인하세요.",
+    url: "/bulletin",
+  },
 };
 
 export const dynamic = "force-dynamic";

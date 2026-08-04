@@ -33,8 +33,21 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export default function AdminCommentsPanel() {
-  const supabase = useMemo(() => createClient(), []);
+export default function AdminCommentsPanel({
+  supabaseUrl,
+  supabasePublishableKey,
+}: {
+  supabaseUrl?: string;
+  supabasePublishableKey?: string;
+}) {
+  const supabase = useMemo(
+    () =>
+      createClient({
+        url: supabaseUrl,
+        publishableKey: supabasePublishableKey,
+      }),
+    [supabasePublishableKey, supabaseUrl],
+  );
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
   const [loading, setLoading] = useState(true);

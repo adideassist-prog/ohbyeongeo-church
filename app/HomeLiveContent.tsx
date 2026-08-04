@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   bulletinFromItem,
@@ -67,10 +68,10 @@ export default function HomeLiveContent({
             <span>{word.date}</span>
           </div>
         </div>
-        <div className="message__play" aria-label="말씀 영상 준비 중">
+        <Link className="message__play" href="/today" aria-label="오늘의 말씀 보기">
           <PlayIcon />
-          <span>영상 채널 준비 중</span>
-        </div>
+          <span>오늘의 말씀 보기</span>
+        </Link>
       </div>
 
       <div className="message__cards">
@@ -90,7 +91,7 @@ export default function HomeLiveContent({
           <span>Prayer request</span>
           <h3>기도 나눔</h3>
           <p>함께 기도할 제목을 나누고 서로를 위해 마음을 모읍니다.</p>
-          <small>안내 준비 중</small>
+          <small>서로를 위해 함께 기도합니다</small>
         </article>
       </div>
     </>

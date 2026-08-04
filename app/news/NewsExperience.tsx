@@ -12,10 +12,10 @@ import {
 } from "../ChurchShell";
 
 const fallbackNewsItems = [
-  { category: "예배", date: "8월 2일", title: "8월 첫째 주 주일예배 안내", body: "온 세대가 함께 모여 찬양하고 말씀을 나누는 예배로 초대합니다.", detail: "온 세대가 함께 모여 찬양하고 말씀을 나누는 예배로 초대합니다.", tone: "terracotta", mediaUrl: null },
-  { category: "다음세대", date: "8월 중", title: "여름 다음세대 특별활동", body: "아이와 청소년이 말씀 안에서 즐겁게 성장하는 시간을 준비합니다.", detail: "아이와 청소년이 말씀 안에서 즐겁게 성장하는 시간을 준비합니다.", tone: "blue", mediaUrl: null },
-  { category: "섬김", date: "상시 모집", title: "함께 섬길 봉사자를 기다립니다", body: "안내, 찬양, 식사 나눔 등 작은 손길로 함께해 주세요.", detail: "안내, 찬양, 식사 나눔 등 작은 손길로 함께해 주세요.", tone: "gold", mediaUrl: null },
-  { category: "모임", date: "매주", title: "소그룹과 교제 모임 안내", body: "삶과 믿음을 편안하게 나누는 따뜻한 공동체 모임입니다.", detail: "삶과 믿음을 편안하게 나누는 따뜻한 공동체 모임입니다.", tone: "navy", mediaUrl: null },
+  { category: "예배", date: "8월 2일", title: "8월 첫째 주 주일예배 안내", body: "민수기 14장 21–24절, ‘하나님을 온전히 따르는 교회’ 말씀을 나눕니다.", detail: "서광봉 목사님과 함께 민수기 14장 21–24절의 말씀을 나눕니다.", tone: "terracotta", mediaUrl: null },
+  { category: "말씀", date: "8월 2일", title: "2부 예배 말씀묵상 강의", body: "양성자 전도사님의 ‘말씀묵상은 마음의 거울이다’ 강의가 진행됩니다.", detail: "2부 예배에서 양성자 전도사님의 ‘말씀묵상은 마음의 거울이다’ 강의가 진행됩니다.", tone: "blue", mediaUrl: null },
+  { category: "선교", date: "7월 30일–8월 6일", title: "공주·대전 JDM 지체 단기선교", body: "캠퍼스 복음 전도와 초청 잔치를 위해 함께 기도해 주세요.", detail: "간사 다섯 분과 대학생 40명이 캠퍼스 복음 전도와 초청 잔치를 위해 함께합니다.", tone: "gold", mediaUrl: null },
+  { category: "선교", date: "8월", title: "베트남 최민철 선교사 선교편지", body: "선교편지를 함께 읽고 현지 사역을 위해 기도해 주세요.", detail: "베트남 최민철 선교사님의 선교편지를 함께 읽고 현지 사역을 위해 기도해 주세요.", tone: "navy", mediaUrl: null },
 ];
 
 function shapeNewsItems(items: ContentItem[]) {
@@ -89,7 +89,7 @@ export default function NewsExperience({ initialItems }: { initialItems: Content
                 {item.mediaUrl ? <img className="news-card__image" src={item.mediaUrl} alt="" /> : null}
                 <div className="news-card__meta"><span>{item.category}</span><time>{item.date}</time></div>
                 <div className="news-card__number">0{index + 1}</div>
-                <h3>{item.title}</h3><p>{item.body}</p><span className="news-card__more">자세히 보기 <ArrowIcon /></span>
+                <h3>{item.title}</h3><p>{item.body}</p><Link className="news-card__more" href="/bulletin">이번 주 주보에서 확인 <ArrowIcon /></Link>
               </article>
             ))}
           </div>
@@ -98,13 +98,13 @@ export default function NewsExperience({ initialItems }: { initialItems: Content
         <section className="notice-board" aria-labelledby="notice-board-title">
           <div className="content-section-title"><div><span>Notice board</span><h2 id="notice-board-title">알려드립니다</h2></div></div>
           <div className="notice-board__list">
-            <article><time>07.31</time><span>공지</span><strong>주일예배에 처음 오시는 분을 위한 안내</strong><small>새가족</small></article>
-            <article><time>07.29</time><span>모집</span><strong>예배 안내와 식사 나눔 봉사자 모집</strong><small>섬김</small></article>
-            <article><time>07.27</time><span>안내</span><strong>다음세대 예배와 부서별 모임 안내</strong><small>다음세대</small></article>
+            <article><time>08.02</time><span>말씀</span><strong>2부 예배 말씀묵상 강의</strong><small>양성자 전도사</small></article>
+            <article><time>07.30</time><span>선교</span><strong>공주·대전 JDM 지체 단기선교</strong><small>8월 6일까지</small></article>
+            <article><time>08월</time><span>기도</span><strong>시편 쓰기·말씀 묵상·성경 통독</strong><small>전 교인</small></article>
           </div>
         </section>
 
-        <section className="news-contact"><div><span>Share your story</span><h2>함께 나누고 싶은<br />교회소식이 있나요?</h2></div><p>관리 화면이 연결되면 담당자가 휴대전화로 소식을 작성하고 바로 게시할 수 있습니다.</p></section>
+        <section className="news-contact"><div><span>Share your story</span><h2>함께 나누고 싶은<br />교회소식이 있나요?</h2></div><p>새로운 소식은 관리자 화면에서 편하게 작성하고 바로 게시할 수 있습니다.</p></section>
       </div>
 
       <ChurchFooter />

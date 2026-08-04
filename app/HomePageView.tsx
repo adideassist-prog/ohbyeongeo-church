@@ -294,7 +294,7 @@ export default function HomePageView({
               <h3>주일예배</h3>
               <p>온 세대가 함께 모여 찬양하고 말씀을 나누는 예배입니다.</p>
             </div>
-            <small>예배 시간 · 교회 확인 후 안내</small>
+            <small>이번 주 주보에서 확인</small>
           </article>
 
           <article className="worship-card">
@@ -306,7 +306,7 @@ export default function HomePageView({
               <h3>평일예배와 기도</h3>
               <p>한 주의 삶을 말씀과 기도로 다시 세우는 시간입니다.</p>
             </div>
-            <small>예배 시간 · 교회 확인 후 안내</small>
+            <small>교회소식에서 확인</small>
           </article>
 
           <article className="worship-card worship-card--blue">
@@ -318,18 +318,17 @@ export default function HomePageView({
               <h3>다음세대 예배</h3>
               <p>아이와 청소년이 기쁨으로 하나님을 만나는 예배입니다.</p>
             </div>
-            <small>부서별 시간 · 교회 확인 후 안내</small>
+            <small>부서별 안내에서 확인</small>
           </article>
         </div>
 
         <div className="worship__notice">
           <span>예배 안내</span>
           <p>
-            정확한 예배 시간과 장소는 교회 확인 후 업데이트됩니다. 방문 전
-            네이버 지도 정보를 함께 확인해 주세요.
+            예배 시간과 모임 일정은 이번 주 주보와 교회소식에서 확인해 주세요.
           </p>
-          <a href={naverMapUrl} target="_blank" rel="noreferrer">
-            지도에서 확인
+          <a href="/bulletin">
+            이번 주 주보 보기
             <ArrowIcon />
           </a>
         </div>

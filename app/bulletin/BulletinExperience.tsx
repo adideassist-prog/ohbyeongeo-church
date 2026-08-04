@@ -15,16 +15,25 @@ import {
   PageNotice,
 } from "../ChurchShell";
 
-const worshipOrder = [
-  ["예배의 부름", "말씀 앞에 마음을 모읍니다"],
-  ["찬양", "다 함께 기쁨으로 찬양합니다"],
-  ["대표기도", "교회와 이웃을 위해 기도합니다"],
-  ["성경봉독", "요한복음 6장 1–13절"],
-  ["특별찬양", "찬양대"],
-  ["말씀선포", "작은 나눔, 큰 은혜"],
-  ["봉헌과 기도", "감사함으로 드립니다"],
-  ["축도", "서광봉 담임목사"],
+const monthNames = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
 ];
+
+function splitPair(line: string) {
+  const [title, description = ""] = line.split(/\s*\|\s*/, 2);
+  return [title, description] as const;
+}
 
 export default function BulletinExperience({
   initialItem,
@@ -44,8 +53,56 @@ export default function BulletinExperience({
   }, []);
 
   const bulletin = useMemo(() => bulletinFromItem(item), [item]);
+  const worshipOrder = useMemo(
+    () => splitLines(bulletin.worshipOrder).map(splitPair),
+    [bulletin.worshipOrder],
+  );
   const scheduleLines = useMemo(() => splitLines(bulletin.schedule), [bulletin.schedule]);
   const serviceLines = useMemo(() => splitLines(bulletin.service), [bulletin.service]);
+  const prayerLines = useMemo(
+    () => splitLines(bulletin.prayerPoints),
+    [bulletin.prayerPoints],
+  );
+  const announcementLines = useMemo(
+    () => splitLines(bulletin.announcements),
+    [bulletin.announcements],
+  );
+  const missionItems = useMemo(
+    () => splitLines(bulletin.missionLetter).map(splitPair),
+    [bulletin.missionLetter],
+  );
+  const domesticPartners = useMemo(
+    () => splitLines(bulletin.partnersDomestic),
+    [bulletin.partnersDomestic],
+  );
+  const overseasPartners = useMemo(
+    () => splitLines(bulletin.partnersOverseas),
+    [bulletin.partnersOverseas],
+  );
+  const militaryPartners = useMemo(
+    () => splitLines(bulletin.partnerMilitary),
+    [bulletin.partnerMilitary],
+  );
+  const institutionPartners = useMemo(
+    () => splitLines(bulletin.partnerInstitutions),
+    [bulletin.partnerInstitutions],
+  );
+  const monthlyPrayer = useMemo(
+    () => splitLines(bulletin.monthlyPrayer).map(splitPair),
+    [bulletin.monthlyPrayer],
+  );
+  const offeringCommittee = useMemo(
+    () => splitLines(bulletin.offeringCommittee),
+    [bulletin.offeringCommittee],
+  );
+  const churchTeam = useMemo(
+    () => splitLines(bulletin.churchTeam).map(splitPair),
+    [bulletin.churchTeam],
+  );
+
+  const [year = "2026", month = "08", day = "02"] =
+    (item?.content_date || "2026-08-02").split("-");
+  const monthLabel = monthNames[Math.max(0, Number(month) - 1)] || "AUG";
 
   return (
     <main className="content-page bulletin-page">
@@ -62,12 +119,12 @@ export default function BulletinExperience({
             <h1>이번 주 주보</h1>
             <p className="content-hero__lead">
               예배의 흐름과 교회 가족이 함께 기억할 소식을
-              <br />한눈에 살펴보세요.
+              <br />읽기 편한 웹 주보로 전합니다.
             </p>
           </div>
           <div className="bulletin-date" aria-label={bulletin.date}>
-            <span>AUG</span>
-            <strong>02</strong>
+            <span>{monthLabel}</span>
+            <strong>{day}</strong>
             <small>SUNDAY</small>
           </div>
         </div>
@@ -97,28 +154,48 @@ export default function BulletinExperience({
           </section>
         ) : null}
 
+        <section className="bulletin-editorial" aria-labelledby="bulletin-theme-title">
+          <div className="bulletin-editorial__art">
+            <img
+              src="/images/hero-warm-symbolic.webp"
+              alt="보리떡 다섯 개와 물고기 두 마리, 펼쳐진 성경을 담은 따뜻한 이미지"
+            />
+          </div>
+          <div className="bulletin-editorial__copy">
+            <span>{year} · {monthLabel}</span>
+            <p>더 큰 선교를 꿈꾸며</p>
+            <h2 id="bulletin-theme-title">예배 하는 자들</h2>
+            <div>
+              <strong>{bulletin.title}</strong>
+              <small>{bulletin.passage}</small>
+            </div>
+            <blockquote>{bulletin.verse}</blockquote>
+            <p className="bulletin-editorial__church">대한예수교 장로회 오병이어교회</p>
+          </div>
+        </section>
+
         <section className="bulletin-grid" aria-label="이번 주 예배 안내">
           <article className="sermon-card">
             <div className="sermon-card__top"><span>Sunday message</span><small>주일 말씀</small></div>
             <div className="sermon-card__body">
               <p>{bulletin.passage}</p>
               <h2>{bulletin.title}</h2>
-              <blockquote>우리가 가진 것이 작아 보여도 사랑으로 내어놓을 때, 하나님은 풍성하게 사용하십니다.</blockquote>
+              <blockquote>{bulletin.verse}</blockquote>
             </div>
             <div className="sermon-card__pastor"><span>말씀</span><strong>{bulletin.preacher}</strong></div>
           </article>
 
           <article className="worship-order" id="worship-order">
             <div className="content-section-title">
-              <div><span>Order of worship</span><h2>주일예배 순서</h2></div>
-              <small>예배 순서는 교회 사정에 따라 변경될 수 있습니다.</small>
+              <div><span>Worship &amp; praise</span><h2>주일예배 순서</h2></div>
+              <small>{bulletin.date}</small>
             </div>
             <ol>
               {worshipOrder.map(([title, description], index) => (
-                <li key={title}>
+                <li key={`${title}-${index}`}>
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <strong>{title}</strong>
-                  <p>{description}</p>
+                  <p>{description || "다 같이"}</p>
                 </li>
               ))}
             </ol>
@@ -152,6 +229,98 @@ export default function BulletinExperience({
           </article>
         </section>
 
+        <section className="bulletin-community" aria-label="기도 제목과 교회소식">
+          <article className="bulletin-prayer">
+            <div className="content-section-title">
+              <div><span>Prayer points</span><h2>기도 제목</h2></div>
+              <small>한마음으로 교회와 선교를 위해 기도해 주세요.</small>
+            </div>
+            <ol>
+              {prayerLines.map((line, index) => (
+                <li key={line}><span>{String(index + 1).padStart(2, "0")}</span><p>{line}</p></li>
+              ))}
+            </ol>
+          </article>
+          <article className="bulletin-announcements">
+            <div className="content-section-title"><div><span>Church news</span><h2>교회소식</h2></div></div>
+            <ol>
+              {announcementLines.map((line, index) => (
+                <li key={line}><b>{index + 1}</b><p>{line}</p></li>
+              ))}
+            </ol>
+            <div className="bulletin-mission-note">
+              <span>8월 선교편지</span>
+              <strong>베트남 · 최민철 선교사</strong>
+              <p>Mission 26 선교대회와 V국 캠퍼스 사역을 위해 함께 기도합니다.</p>
+            </div>
+          </article>
+        </section>
+
+        <section className="mission-letter" aria-labelledby="mission-letter-title">
+          <header className="mission-letter__header">
+            <div>
+              <span>Mission letter · August</span>
+              <h2 id="mission-letter-title">8월 선교편지</h2>
+              <p>베트남 · 최민철 선교사님</p>
+            </div>
+            <svg className="mission-flame" viewBox="0 0 72 92" aria-hidden="true">
+              <path d="M39 4c4 20-10 25-10 40 0 8 5 13 11 16-2-9 4-14 11-22 2 7 9 13 9 25 0 15-10 25-24 25S11 78 11 62c0-20 17-29 28-58Z" />
+              <path d="M36 84c-7-2-12-8-12-16 0-8 5-13 10-18-1 9 4 11 7 17 4-5 7-9 8-15 5 6 8 11 8 18 0 9-8 16-21 14Z" />
+            </svg>
+          </header>
+          <div className="mission-letter__items">
+            {missionItems.map(([title, body], index) => (
+              <article key={`${title}-${index}`}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div><h3>{title}</h3><p>{body}</p></div>
+              </article>
+            ))}
+          </div>
+          <div className="mission-letter__closing">
+            {bulletin.missionClosing.split(/\n\s*\n/).map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+            <strong>{bulletin.missionSignature}</strong>
+          </div>
+        </section>
+
+        <section className="partner-section" aria-labelledby="partner-title">
+          <header className="partner-section__header">
+            <span>Together in mission</span>
+            <h2 id="partner-title">오병이어교회가 협력하는 곳</h2>
+            <p>국내와 세계 곳곳의 교회·선교사·기관과 함께 기도합니다.</p>
+          </header>
+          <div className="partner-section__grid">
+            <PartnerCard label="01 · 국내" items={domesticPartners} className="partner-card--domestic" />
+            <PartnerCard label="02 · 해외" items={overseasPartners} className="partner-card--overseas" />
+            <PartnerCard label="03 · 군선교" items={militaryPartners} className="partner-card--compact" />
+            <PartnerCard label="04 · 기관" items={institutionPartners} className="partner-card--compact" />
+          </div>
+        </section>
+
+        <section className="bulletin-people" aria-label="8월 예배위원과 교회 섬김이">
+          <article className="monthly-committee">
+            <div className="content-section-title"><div><span>August service</span><h2>8월 예배 위원 안내</h2></div></div>
+            <div className="monthly-committee__table">
+              {monthlyPrayer.map(([date, person]) => (
+                <div key={date}><time>{date}</time><span>대표기도</span><strong>{person}</strong></div>
+              ))}
+            </div>
+            <div className="monthly-committee__offering">
+              <span>헌금위원</span>
+              {offeringCommittee.map((line) => <strong key={line}>{line}</strong>)}
+            </div>
+          </article>
+          <article className="church-team">
+            <div className="content-section-title"><div><span>Ohbyeongeo church</span><h2>교회와 섬김이</h2></div></div>
+            <dl>
+              {churchTeam.map(([role, people], index) => (
+                <div key={`${role}-${index}`}><dt>{role}</dt><dd>{people}</dd></div>
+              ))}
+            </dl>
+          </article>
+        </section>
+
         <section className="bulletin-bottom">
           <div><p className="section-label">Church news</p><h2>예배 후, 교회소식도<br />함께 확인해 주세요.</h2></div>
           <Link className="content-link-button" href="/news">이번 주 교회소식 보기 <ArrowIcon /></Link>
@@ -160,5 +329,22 @@ export default function BulletinExperience({
 
       <ChurchFooter />
     </main>
+  );
+}
+
+function PartnerCard({
+  label,
+  items,
+  className,
+}: {
+  label: string;
+  items: string[];
+  className: string;
+}) {
+  return (
+    <article className={`partner-card ${className}`}>
+      <span>{label}</span>
+      <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul>
+    </article>
   );
 }

@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   description:
     "오병이어교회의 예배, 모임, 다음세대, 섬김과 나눔 소식을 확인하세요.",
   alternates: { canonical: "/news" },
+  openGraph: {
+    title: "교회소식 | 오병이어교회",
+    description:
+      "오병이어교회의 예배, 모임, 다음세대, 섬김과 나눔 소식을 확인하세요.",
+    url: "/news",
+  },
 };
 
 export const dynamic = "force-dynamic";

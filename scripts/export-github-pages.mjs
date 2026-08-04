@@ -6,6 +6,15 @@ const distClient = path.join(root, "dist", "client");
 const docs = path.join(root, "docs");
 const publicUrl = "https://adideassist-prog.github.io/ohbyeongeo-church";
 const githubPagesBasePath = "/ohbyeongeo-church/";
+// These are Supabase's public browser credentials, not service-role secrets.
+// GitHub Pages has no server-side environment, so keep a deploy-safe fallback
+// to ensure the administrator and live content still hydrate after a clean
+// build from a fresh checkout.
+const githubRuntimeDefaults = {
+  NEXT_PUBLIC_SUPABASE_URL: "https://sbylghthpkkwivolhjcz.supabase.co",
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+    "sb_publishable_GIX0l-omcNIGk_OFHHeC5Q_Y8w1xn3Z",
+};
 const publicRoutes = ["/", "/bulletin", "/today", "/news"];
 const routes = [...publicRoutes, "/admin"];
 
@@ -65,7 +74,7 @@ const openingFallback = `
   // Match the live Site exactly: keep the intro visible for 1.8 seconds,
   // then let the same 1.15-second upward motion reveal the homepage.
   window.setTimeout(() => {
-    opening.remove();
+    opening.classList.add("opening-screen--settled");
     releasePage();
   }, 3000);
 })();
@@ -74,8 +83,8 @@ const openingFallback = `
 const openingCriticalStyle = `<style id="opening-critical">
 html.intro-pending,
 html.intro-pending body{margin:0;overflow:hidden}
-html.intro-pending body>main>*:not(.opening-screen){visibility:hidden!important}
 html.intro-pending .opening-screen{position:fixed;z-index:2147483647;inset:0;display:grid;width:100%;height:100%;overflow:hidden;place-items:center;padding:0;background:#f8f3eb;box-shadow:0 24px 70px rgba(55,42,30,.16);color:inherit;text-align:center;transform:translateY(0);will-change:transform;animation:opening-screen-critical-leave 1.15s 1.8s forwards cubic-bezier(.76,0,.24,1)}
+html .opening-screen.opening-screen--settled{visibility:hidden;pointer-events:none;transform:translateY(-105%)}
 html.intro-pending .opening-screen__brand{display:flex;align-items:center;flex-direction:column;gap:13px;animation:opening-brand-critical-in .8s .12s both cubic-bezier(.2,.75,.25,1)}
 html.intro-pending .opening-screen__brand img{display:block;width:min(330px,82vw);height:auto;object-fit:contain}
 html.intro-pending .opening-screen__english{color:rgba(68,55,43,.5);font-family:"Iowan Old Style","Times New Roman",serif;font-size:9px;font-weight:600;letter-spacing:.24em}
@@ -88,49 +97,6 @@ function prepareOpeningPage(html) {
   return html
     .replace('<html lang="ko">', '<html lang="ko" class="intro-pending">')
     .replace("</head>", `${openingCriticalStyle}</head>`);
-}
-
-function createHardNavigationScript() {
-  return `
-<script>
-(() => {
-  const basePath = "/ohbyeongeo-church";
-  const rootChurchRoutes = new Set(["/", "/bulletin", "/today", "/news", "/admin"]);
-  document.addEventListener(
-    "click",
-    (event) => {
-      const anchor = event.target.closest?.("a[href]");
-      if (!anchor || event.defaultPrevented || event.button !== 0) return;
-      if (anchor.target && anchor.target !== "_self") return;
-
-      const url = new URL(anchor.href, window.location.href);
-      if (url.origin !== window.location.origin) return;
-
-      // Keep navigation safe even if a cached client bundle briefly restores
-      // the app's root-relative routes after hydration.
-      const rootPath = url.pathname.replace(/\\/+$/, "") || "/";
-      if (rootChurchRoutes.has(rootPath)) {
-        url.pathname = rootPath === "/" ? basePath + "/" : basePath + rootPath;
-      }
-
-      const isChurchRoute =
-        url.pathname === basePath || url.pathname.startsWith(basePath + "/");
-      if (!isChurchRoute) return;
-
-      const sameDocument =
-        url.pathname === window.location.pathname &&
-        url.search === window.location.search;
-      if (sameDocument && url.hash) return;
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      window.churchMusicPersistNow?.();
-      window.location.assign(url.href);
-    },
-    true,
-  );
-})();
-</script>`;
 }
 
 const musicPlayerFallback = `
@@ -451,8 +417,18 @@ const visitorCounterFallback = `
 // source nearby for recovery work without running a second counter in browsers.
 void visitorCounterFallback;
 
-await rm(docs, { recursive: true, force: true });
 await mkdir(docs, { recursive: true });
+// The weekly bulletin artwork and scanned-page archive were curated directly
+// in docs before the source exporter existed. Keep those durable media files,
+// while clearing every generated route and asset so stale JS chunks can never
+// leave the administrator page blank again.
+for (const entry of await readdir(docs, { withFileTypes: true })) {
+  if (entry.name === "images" || entry.name === "bulletins") continue;
+  await rm(path.join(docs, entry.name), {
+    recursive: entry.isDirectory(),
+    force: true,
+  });
+}
 await cp(distClient, docs, {
   recursive: true,
   filter(source) {
@@ -469,15 +445,27 @@ const context = {
   passThroughOnException() {},
 };
 const runtimeEnv = {
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_URL:
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??
+    githubRuntimeDefaults.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    githubRuntimeDefaults.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 };
 
 const renderedPages = new Map();
 for (const route of routes) {
   const response = await worker.default.fetch(
-    new Request(`https://ohbyeongeo-church.modoomoa365.chatgpt.site${route}`),
+    new Request(
+      `https://ohbyeongeo-church.modoomoa365.chatgpt.site/github?route=${encodeURIComponent(route)}`,
+      {
+        headers: {
+          "x-church-supabase-url": runtimeEnv.NEXT_PUBLIC_SUPABASE_URL ?? "",
+          "x-church-supabase-key":
+            runtimeEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "",
+        },
+      },
+    ),
     runtimeEnv,
     context,
   );
@@ -493,7 +481,7 @@ for (const route of routes) {
 function createStaticPage(route) {
   const renderedPage = renderedPages.get(route);
   const page = route === "/" ? prepareOpeningPage(renderedPage) : renderedPage;
-  const beforeRuntime = `${route === "/" ? openingFallback : ""}${createHardNavigationScript()}${musicPlayerFallback}`;
+  const beforeRuntime = `${route === "/" ? openingFallback : ""}${musicPlayerFallback}`;
 
   return page.replace(
     '<script id="_R_">',
@@ -525,6 +513,14 @@ await writeFile(
 );
 
 const assetDirectory = path.join(docs, "assets");
+const sourceAssetFiles = new Set(
+  await readdir(path.join(distClient, "assets")),
+);
+for (const filename of await readdir(assetDirectory)) {
+  if (!sourceAssetFiles.has(filename)) {
+    await rm(path.join(assetDirectory, filename), { force: true });
+  }
+}
 const assetFiles = await readdir(assetDirectory);
 for (const filename of assetFiles.filter((name) => name.endsWith(".js"))) {
   const filePath = path.join(assetDirectory, filename);
@@ -546,6 +542,39 @@ for (const filename of assetFiles.filter((name) => name.endsWith(".css"))) {
   let css = await readFile(cssPath, "utf8");
   css = css.replaceAll("url(/images/", `url(${githubPagesBasePath}images/`);
   await writeFile(cssPath, css);
+}
+
+// Vinext currently emits two complete hashed client generations for this
+// multi-route export. Only one graph is linked by the rendered HTML. Walk that
+// graph and remove the unreachable generation so a partial GitHub upload can
+// never mix old HTML with a similarly named stale chunk.
+const reachableAssets = new Set();
+const pendingAssets = [];
+const collectAssetReferences = (source) => {
+  for (const filename of assetFiles) {
+    if (!reachableAssets.has(filename) && source.includes(filename)) {
+      reachableAssets.add(filename);
+      pendingAssets.push(filename);
+    }
+  }
+};
+
+for (const route of routes) {
+  collectAssetReferences(createStaticPage(route));
+}
+collectAssetReferences(createStaticPage("/"));
+
+while (pendingAssets.length > 0) {
+  const filename = pendingAssets.pop();
+  if (!filename) continue;
+  const source = await readFile(path.join(assetDirectory, filename), "utf8");
+  collectAssetReferences(source);
+}
+
+for (const filename of assetFiles) {
+  if (!reachableAssets.has(filename)) {
+    await rm(path.join(assetDirectory, filename), { force: true });
+  }
 }
 
 console.log(`GitHub Pages export created at ${docs}`);
