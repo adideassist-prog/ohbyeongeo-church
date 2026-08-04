@@ -109,6 +109,19 @@ export const defaultWord: WordDraft = {
     "말씀으로 제 길을 밝혀 주시는 주님, 앞이 보이지 않을 때에도 두려워하지 않고 오늘 주신 말씀을 따라 한 걸음씩 순종하게 해 주세요.",
 };
 
+const augustFirstWord: WordDraft = {
+  date: "2026. 08. 01. 토요일",
+  passage: "요한복음 6장 9절",
+  verse:
+    "여기 한 아이가 있어 보리떡 다섯 개와 물고기 두 마리를 가지고 있나이다.",
+  title: "내 손에 있는 작은 것을 주님께 드릴 때",
+  meditation:
+    "하나님은 우리가 얼마나 많이 가졌는지를 먼저 묻지 않으십니다. 지금 내 손에 있는 작은 시간과 따뜻한 말 한마디를 기쁨으로 드리는 마음을 보십니다.",
+  question: "내가 오늘 기쁨으로 나눌 수 있는 한 가지는 무엇인가요?",
+  prayer:
+    "사랑의 주님, 제가 가진 것이 작다고 주저하지 않게 하시고 기쁨으로 내어놓는 믿음을 주세요.",
+};
+
 const augustSecondWord: WordDraft = {
   date: "2026. 08. 02. 주일",
   passage: "민수기 14장 24절",
@@ -160,6 +173,7 @@ export const defaultWordItems: ContentItem[] = [
   createDefaultWordItem("2026-08-04", defaultWord),
   createDefaultWordItem("2026-08-03", augustThirdWord),
   createDefaultWordItem("2026-08-02", augustSecondWord),
+  createDefaultWordItem("2026-08-01", augustFirstWord),
 ];
 
 export function mergePublishedWords(items: ContentItem[]) {

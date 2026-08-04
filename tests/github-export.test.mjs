@@ -150,15 +150,18 @@ test("GitHub export removes stale hashed client generations", async () => {
   assert.equal(assets.filter((name) => name.endsWith(".css")).length, 1);
 });
 
-test("GitHub today page includes August 2, 3, and 4 daily words", async () => {
+test("GitHub today page preserves the original August 1 word and later daily words", async () => {
   const today = await read("docs/today/index.html");
 
-  for (const date of ["2026-08-02", "2026-08-03", "2026-08-04"]) {
+  for (const date of ["2026-08-01", "2026-08-02", "2026-08-03", "2026-08-04"]) {
     assert.match(today, new RegExp(`/ohbyeongeo-church/today\\?date=${date}`));
   }
 
+  assert.match(today, /내 손에 있는 작은 것을 주님께 드릴 때/);
+  assert.match(today, /요한복음 6장 9절/);
   assert.match(today, /내 생각보다 주님의 길을 신뢰하기/);
   assert.match(today, /말씀의 빛을 따라 한 걸음씩/);
+  assert.match(today, /<span>토<\/span><strong>01일<\/strong>/);
   assert.match(today, /<span>월<\/span><strong>03일<\/strong>/);
   assert.match(today, /<span>화<\/span><strong>04일<\/strong>/);
 });
