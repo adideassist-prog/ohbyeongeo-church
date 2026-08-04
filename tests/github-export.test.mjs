@@ -74,3 +74,16 @@ test("GitHub navigation retains the repository base path after hydration", async
     assert.match(page, /url\.pathname = rootPath === "\/" \? basePath \+ "\/" : basePath \+ rootPath/);
   }
 });
+
+test("GitHub today page includes August 2, 3, and 4 daily words", async () => {
+  const today = await read("docs/today/index.html");
+
+  for (const date of ["2026-08-02", "2026-08-03", "2026-08-04"]) {
+    assert.match(today, new RegExp(`/ohbyeongeo-church/today\\?date=${date}`));
+  }
+
+  assert.match(today, /내 생각보다 주님의 길을 신뢰하기/);
+  assert.match(today, /말씀의 빛을 따라 한 걸음씩/);
+  assert.match(today, /<span>월<\/span><strong>03일<\/strong>/);
+  assert.match(today, /<span>화<\/span><strong>04일<\/strong>/);
+});
