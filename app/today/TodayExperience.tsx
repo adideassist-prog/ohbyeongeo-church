@@ -16,9 +16,9 @@ function dateParts(value: string) {
   const date = new Date(`${value}T12:00:00+09:00`);
   if (Number.isNaN(date.getTime())) return { day: "말씀", date: value.slice(-2), month: "" };
   return {
-    day: new Intl.DateTimeFormat("ko-KR", { weekday: "short" }).format(date),
-    date: new Intl.DateTimeFormat("ko-KR", { day: "2-digit" }).format(date),
-    month: new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long" }).format(date),
+    day: new Intl.DateTimeFormat("ko-KR", { weekday: "short", timeZone: "Asia/Seoul" }).format(date),
+    date: new Intl.DateTimeFormat("ko-KR", { day: "2-digit", timeZone: "Asia/Seoul" }).format(date),
+    month: new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", timeZone: "Asia/Seoul" }).format(date),
   };
 }
 
@@ -57,7 +57,7 @@ export default function TodayExperience({
     [items, selectedDate],
   );
   const word = wordFromItem(selectedItem);
-  const wordKey = selectedItem?.content_date ?? "2026-08-01";
+  const wordKey = selectedItem?.content_date ?? "2026-08-04";
   const selectedIndex = items.findIndex((item) => item.id === selectedItem?.id);
   const newerWord = selectedIndex > 0 ? items[selectedIndex - 1] : null;
   const olderWord = selectedIndex >= 0 && selectedIndex < items.length - 1 ? items[selectedIndex + 1] : null;
@@ -109,7 +109,7 @@ export default function TodayExperience({
         <WordComments key={wordKey} wordKey={wordKey} wordLabel={`${word.date} · ${word.passage}`} />
 
         <section className="word-next">
-          <div><span>Sunday message</span><h2>이번 주 주일 말씀을<br />미리 만나보세요.</h2><p>요한복음 6장 · 작은 나눔, 큰 은혜</p></div>
+          <div><span>Sunday message</span><h2>이번 주 주일 말씀을<br />다시 만나보세요.</h2><p>민수기 14장 21–24절 · 하나님을 온전히 따르는 교회</p></div>
           <Link className="content-link-button content-link-button--light" href="/bulletin">이번 주 주보 보기 <ArrowIcon /></Link>
         </section>
       </div>
