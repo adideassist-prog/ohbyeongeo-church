@@ -1,5 +1,9 @@
 import { cookies } from "next/headers";
-import type { ContentItem, ContentType } from "./church-content";
+import {
+  mergePublishedWords,
+  type ContentItem,
+  type ContentType,
+} from "./church-content";
 import { createClient } from "../utils/supabase/server";
 
 export async function loadPublishedContent(
@@ -39,9 +43,11 @@ export async function loadPublishedWords(limit = 1000) {
   const items = await loadPublishedContent("daily_word", limit);
   const seenDates = new Set<string>();
 
-  return items.filter((item) => {
+  const uniqueItems = items.filter((item) => {
     if (seenDates.has(item.content_date)) return false;
     seenDates.add(item.content_date);
     return true;
   });
+
+  return mergePublishedWords(uniqueItems);
 }
