@@ -109,11 +109,21 @@ export default function MusicPlayer() {
     const shouldPlay = saved?.playing ?? true;
     audio.volume = 0.55;
 
+    const syncDuration = () => {
+      if (disposed) {
+        return;
+      }
+
+      const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
+      setDuration(nextDuration);
+    };
+
     const restorePlayback = () => {
       if (disposed || restoredRef.current) {
         return;
       }
 
+      syncDuration();
       restoredRef.current = true;
 
       if (saved && saved.currentTime > 0) {
@@ -165,8 +175,10 @@ export default function MusicPlayer() {
     window.addEventListener("pagehide", persistBeforeNavigation);
     audio.addEventListener("loadedmetadata", restorePlayback);
     audio.addEventListener("canplay", restorePlayback);
+    audio.addEventListener("durationchange", syncDuration);
 
     if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) {
+      syncDuration();
       restorePlayback();
     }
 
@@ -175,6 +187,7 @@ export default function MusicPlayer() {
       window.removeEventListener("pagehide", persistBeforeNavigation);
       audio.removeEventListener("loadedmetadata", restorePlayback);
       audio.removeEventListener("canplay", restorePlayback);
+      audio.removeEventListener("durationchange", syncDuration);
       if (musicWindow.churchMusicPersistNow) {
         delete musicWindow.churchMusicPersistNow;
       }
