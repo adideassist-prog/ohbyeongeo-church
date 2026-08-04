@@ -52,5 +52,6 @@ test("GitHub navigation preserves music position and playback state", async () =
   assert.match(today, /window\.churchMusicPersistNow\?\.\(\)/);
   assert.doesNotMatch(today, /<audio[^>]*\bautoPlay=/);
   assert.match(musicSource, /\/ohbyeongeo-church\/audio\/grace-gathered-us\.m4a/);
+  assert.match(musicSource, /durationchange/);
   assert.doesNotMatch(musicSource, /src:`\/audio\/grace-gathered-us\.m4a/);
 });
