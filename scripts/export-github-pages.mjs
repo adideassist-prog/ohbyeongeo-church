@@ -32,13 +32,13 @@ function rewriteForGitHub(content) {
     // Vinext serializes server-rendered Link props into the RSC payload. The
     // visible HTML above is rewritten first, but hydration would otherwise
     // restore these root-relative hrefs and send GitHub Pages to /bulletin.
-    .replaceAll('\\\"href\\\":\\\"/bulletin\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}bulletin\\\"`)
-    .replaceAll('\\\"href\\\":\\\"/today\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}today\\\"`)
-    .replaceAll('\\\"href\\\":\\\"/today?', `\\\"href\\\":\\\"${githubPagesBasePath}today?`)
-    .replaceAll('\\\"href\\\":\\\"/news\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}news\\\"`)
-    .replaceAll('\\\"href\\\":\\\"/admin\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}admin\\\"`)
-    .replaceAll('\\\"href\\\":\\\"/#', `\\\"href\\\":\\\"${githubPagesBasePath}#`)
-    .replaceAll('\\\"href\\\":\\\"/\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}\\\"`)
+    .replaceAll('\\"href\\":\\"/bulletin\\"', `\\"href\\":\\"${githubPagesBasePath}bulletin\\"`)
+    .replaceAll('\\"href\\":\\"/today\\"', `\\"href\\":\\"${githubPagesBasePath}today\\"`)
+    .replaceAll('\\"href\\":\\"/today?', `\\"href\\":\\"${githubPagesBasePath}today?`)
+    .replaceAll('\\"href\\":\\"/news\\"', `\\"href\\":\\"${githubPagesBasePath}news\\"`)
+    .replaceAll('\\"href\\":\\"/admin\\"', `\\"href\\":\\"${githubPagesBasePath}admin\\"`)
+    .replaceAll('\\"href\\":\\"/#', `\\"href\\":\\"${githubPagesBasePath}#`)
+    .replaceAll('\\"href\\":\\"/\\"', `\\"href\\":\\"${githubPagesBasePath}\\"`)
     .replaceAll('src:`/images/', `src:\`${githubPagesBasePath}images/`)
     .replaceAll('src:`/audio/', `src:\`${githubPagesBasePath}audio/`)
     .replaceAll('`/images/', `\`${githubPagesBasePath}images/`)
@@ -108,7 +108,7 @@ function createHardNavigationScript() {
 
       // Keep navigation safe even if a cached client bundle briefly restores
       // the app's root-relative routes after hydration.
-      const rootPath = url.pathname.replace(/\/+$/, "") || "/";
+      const rootPath = url.pathname.replace(/\\/+$/, "") || "/";
       if (rootChurchRoutes.has(rootPath)) {
         url.pathname = rootPath === "/" ? basePath + "/" : basePath + rootPath;
       }
