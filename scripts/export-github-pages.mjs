@@ -44,10 +44,6 @@ const openingFallback = `
 (() => {
   const opening = document.querySelector(".opening-screen");
   const releasePage = () => {
-    // Keep the completed frame hidden while the critical intro class is
-    // released. This prevents the regular stylesheet from restarting the
-    // animation for a single visible frame.
-    opening?.classList.add("opening-screen--settled");
     document.documentElement.classList.remove("intro-pending");
   };
 
@@ -59,9 +55,7 @@ const openingFallback = `
   // Match the live Site exactly: keep the intro visible for 1.8 seconds,
   // then let the same 1.15-second upward motion reveal the homepage.
   window.setTimeout(() => {
-    // React owns the opening node after hydration. Removing it here races with
-    // GitHubApp's state update and can make React unmount the whole document.
-    // The CSS animation already hides the intro, so only release page scrolling.
+    opening.remove();
     releasePage();
   }, 3000);
 })();
@@ -70,20 +64,55 @@ const openingFallback = `
 const openingCriticalStyle = `<style id="opening-critical">
 html.intro-pending,
 html.intro-pending body{margin:0;overflow:hidden}
+html.intro-pending body>main>*:not(.opening-screen){visibility:hidden!important}
 html.intro-pending .opening-screen{position:fixed;z-index:2147483647;inset:0;display:grid;width:100%;height:100%;overflow:hidden;place-items:center;padding:0;background:#f8f3eb;box-shadow:0 24px 70px rgba(55,42,30,.16);color:inherit;text-align:center;transform:translateY(0);will-change:transform;animation:opening-screen-critical-leave 1.15s 1.8s forwards cubic-bezier(.76,0,.24,1)}
-.opening-screen.opening-screen--settled{visibility:hidden!important;pointer-events:none!important;transform:translateY(-105%)!important;animation:none!important}
 html.intro-pending .opening-screen__brand{display:flex;align-items:center;flex-direction:column;gap:13px;animation:opening-brand-critical-in .8s .12s both cubic-bezier(.2,.75,.25,1)}
 html.intro-pending .opening-screen__brand img{display:block;width:min(330px,82vw);height:auto;object-fit:contain}
 html.intro-pending .opening-screen__english{color:rgba(68,55,43,.5);font-family:"Iowan Old Style","Times New Roman",serif;font-size:9px;font-weight:600;letter-spacing:.24em}
 @keyframes opening-brand-critical-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes opening-screen-critical-leave{0%{visibility:visible;transform:translateY(0)}99%{visibility:visible;transform:translateY(-105%)}100%{visibility:hidden;pointer-events:none;transform:translateY(-105%)}}
 @media (max-width:700px){html.intro-pending .opening-screen__brand{gap:9px}html.intro-pending .opening-screen__brand img{width:min(292px,84vw)}html.intro-pending .opening-screen__english{font-size:7px;letter-spacing:.19em}}
-</style><noscript><style>html.intro-pending,html.intro-pending body{overflow:auto}html.intro-pending .opening-screen{display:none!important}</style></noscript>`;
+</style><noscript><style>html.intro-pending,html.intro-pending body{overflow:auto}html.intro-pending body>main>*{visibility:visible!important}html.intro-pending .opening-screen{display:none!important}</style></noscript>`;
 
 function prepareOpeningPage(html) {
   return html
     .replace('<html lang="ko">', '<html lang="ko" class="intro-pending">')
     .replace("</head>", `${openingCriticalStyle}</head>`);
+}
+
+function createHardNavigationScript() {
+  return `
+<script>
+(() => {
+  const basePath = "/ohbyeongeo-church";
+  document.addEventListener(
+    "click",
+    (event) => {
+      const anchor = event.target.closest?.("a[href]");
+      if (!anchor || event.defaultPrevented || event.button !== 0) return;
+      if (anchor.target && anchor.target !== "_self") return;
+
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+
+      const isChurchRoute =
+        url.pathname === basePath || url.pathname.startsWith(basePath + "/");
+      if (!isChurchRoute) return;
+
+      const sameDocument =
+        url.pathname === window.location.pathname &&
+        url.search === window.location.search;
+      if (sameDocument && url.hash) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.churchMusicPersistNow?.();
+      window.location.assign(url.href);
+    },
+    true,
+  );
+})();
+</script>`;
 }
 
 const musicPlayerFallback = `
@@ -421,14 +450,17 @@ const context = {
   waitUntil() {},
   passThroughOnException() {},
 };
+const runtimeEnv = {
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+};
 
 const renderedPages = new Map();
 for (const route of routes) {
   const response = await worker.default.fetch(
-    new Request(
-      `https://ohbyeongeo-church.modoomoa365.chatgpt.site/github?route=${encodeURIComponent(route)}`,
-    ),
-    {},
+    new Request(`https://ohbyeongeo-church.modoomoa365.chatgpt.site${route}`),
+    runtimeEnv,
     context,
   );
 
@@ -443,7 +475,7 @@ for (const route of routes) {
 function createStaticPage(route) {
   const renderedPage = renderedPages.get(route);
   const page = route === "/" ? prepareOpeningPage(renderedPage) : renderedPage;
-  const beforeRuntime = `${route === "/" ? openingFallback : ""}${musicPlayerFallback}`;
+  const beforeRuntime = `${route === "/" ? openingFallback : ""}${createHardNavigationScript()}${musicPlayerFallback}`;
 
   return page.replace(
     '<script id="_R_">',
