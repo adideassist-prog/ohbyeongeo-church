@@ -55,3 +55,23 @@ test("GitHub navigation preserves music position and playback state", async () =
   assert.match(musicSource, /durationchange/);
   assert.doesNotMatch(musicSource, /src:`\/audio\/grace-gathered-us\.m4a/);
 });
+
+
+test("GitHub navigation retains the repository base path after hydration", async () => {
+  const pages = await Promise.all([
+    read("docs/index.html"),
+    read("docs/bulletin/index.html"),
+    read("docs/today/index.html"),
+    read("docs/news/index.html"),
+    read("docs/admin/index.html"),
+  ]);
+
+  for (const page of pages) {
+    assert.doesNotMatch(
+      page,
+      /\\\"href\\\":\\\"\/(?:bulletin|today|news|admin)(?:\\\"|\?)/,
+    );
+    assert.match(page, /const rootChurchRoutes = new Set/);
+    assert.match(page, /url\.pathname = rootPath === "\/" \? basePath \+ "\/" : basePath \+ rootPath/);
+  }
+});
