@@ -56,7 +56,6 @@ test("GitHub navigation preserves music position and playback state", async () =
   assert.doesNotMatch(musicSource, /src:`\/audio\/grace-gathered-us\.m4a/);
 });
 
-
 test("GitHub navigation retains the repository base path after hydration", async () => {
   const pages = await Promise.all([
     read("docs/index.html"),
