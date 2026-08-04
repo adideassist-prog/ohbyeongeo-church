@@ -29,6 +29,16 @@ function rewriteForGitHub(content) {
     .replaceAll('href="/admin"', `href="${githubPagesBasePath}admin"`)
     .replaceAll('href="/#', `href="${githubPagesBasePath}#`)
     .replaceAll('href="/"', `href="${githubPagesBasePath}"`)
+    // Vinext serializes server-rendered Link props into the RSC payload. The
+    // visible HTML above is rewritten first, but hydration would otherwise
+    // restore these root-relative hrefs and send GitHub Pages to /bulletin.
+    .replaceAll('\\\"href\\\":\\\"/bulletin\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}bulletin\\\"`)
+    .replaceAll('\\\"href\\\":\\\"/today\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}today\\\"`)
+    .replaceAll('\\\"href\\\":\\\"/today?', `\\\"href\\\":\\\"${githubPagesBasePath}today?`)
+    .replaceAll('\\\"href\\\":\\\"/news\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}news\\\"`)
+    .replaceAll('\\\"href\\\":\\\"/admin\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}admin\\\"`)
+    .replaceAll('\\\"href\\\":\\\"/#', `\\\"href\\\":\\\"${githubPagesBasePath}#`)
+    .replaceAll('\\\"href\\\":\\\"/\\\"', `\\\"href\\\":\\\"${githubPagesBasePath}\\\"`)
     .replaceAll('src:`/images/', `src:\`${githubPagesBasePath}images/`)
     .replaceAll('src:`/audio/', `src:\`${githubPagesBasePath}audio/`)
     .replaceAll('`/images/', `\`${githubPagesBasePath}images/`)
@@ -85,6 +95,7 @@ function createHardNavigationScript() {
 <script>
 (() => {
   const basePath = "/ohbyeongeo-church";
+  const rootChurchRoutes = new Set(["/", "/bulletin", "/today", "/news", "/admin"]);
   document.addEventListener(
     "click",
     (event) => {
@@ -94,6 +105,13 @@ function createHardNavigationScript() {
 
       const url = new URL(anchor.href, window.location.href);
       if (url.origin !== window.location.origin) return;
+
+      // Keep navigation safe even if a cached client bundle briefly restores
+      // the app's root-relative routes after hydration.
+      const rootPath = url.pathname.replace(/\/+$/, "") || "/";
+      if (rootChurchRoutes.has(rootPath)) {
+        url.pathname = rootPath === "/" ? basePath + "/" : basePath + rootPath;
+      }
 
       const isChurchRoute =
         url.pathname === basePath || url.pathname.startsWith(basePath + "/");
